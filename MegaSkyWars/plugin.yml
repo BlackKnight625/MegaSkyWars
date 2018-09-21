@@ -1,0 +1,17 @@
+name: MegaSkyWars
+version: 1.0
+main: me.BlackKnight625.MegaSkyWars.Main
+author: BlackKnight625
+description: A grand mini-game for a bunch of players
+api-version: 1.13
+commands:
+   oi:
+      description: Debugging tool
+      usage: /oi
+      permission: <MegaSkyWars>.oi
+      permission-message: You don't have <permission>
+   team:
+      description: Join a team
+      usage: /team (player) join TEAMCOLOR
+      permission: <MegaSkyWars>.team
+      permission-message: You don't have <permission>
