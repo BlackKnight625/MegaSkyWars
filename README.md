@@ -1,0 +1,2 @@
+# MegaSkyWars
+A Minecraft Plugin
