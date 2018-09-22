@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="C:/Users/rafael/Desktop/Plugins/MegaSkyWars.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/MegaSkyWars/SaveAll.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="/Users/hlouren/Desktop/Plugins/MegaSkyWars.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/MegaSkywars/SaveAll.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=MegaSkyWars"/>
+        <folder path="/MegaSkywars/lib"/>
+        <file path="/MegaSkywars/.classpath"/>
+        <javaElement handleIdentifier="=MegaSkywars/src"/>
+        <file path="/MegaSkywars/.project"/>
+        <file path="/MegaSkywars/plugin.yml"/>
+        <file path="/MegaSkywars/SaveAll.jardesc"/>
     </selectedElements>
 </jardesc>
