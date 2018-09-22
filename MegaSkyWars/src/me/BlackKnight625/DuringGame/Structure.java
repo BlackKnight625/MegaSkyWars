@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 
 import me.BlackKnight625.MegaSkyWars.Main;
 import me.BlackKnight625.MegaSkyWars.Utilities;
-import sun.security.action.GetLongAction;
+//import sun.security.action.GetLongAction;
 
 @SuppressWarnings("unused")
 public class Structure {
