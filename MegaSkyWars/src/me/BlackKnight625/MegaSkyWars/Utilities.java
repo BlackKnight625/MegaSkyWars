@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.Player;
+import org.bukkit.block.data.Bisected;
 
 public class Utilities {
 	
@@ -76,7 +78,18 @@ public class Utilities {
  
                 for(int z = minZ; z <= maxZ; z++){
  
-                    Block b = block1.getWorld().getBlockAt(x, y, z);        
+                    Block b = block1.getWorld().getBlockAt(x, y, z); 
+                    if (b.getType().toString().contains("DOOR") && !b.getType().toString().contains("TRAP")) {
+                    	if (b.getWorld().getBlockAt(x, y-1, z).getType().toString().contains("DOOR")) {
+                    		Door d = (Door) b.getBlockData();
+                    		d.setHalf(Bisected.Half.TOP);
+                    	}
+                    	else {
+                    		Door d = (Door) b.getBlockData();
+                    		d.setHalf(Bisected.Half.BOTTOM);
+                    	}
+                    }
+                    
                     blocks.add(b);                          
                 }
             }

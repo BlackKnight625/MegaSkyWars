@@ -2,6 +2,7 @@ package me.BlackKnight625.DuringGame;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -228,15 +229,34 @@ public class Structure {
 					b.setBlockData(block.getBlockData());
 					Utilities.rotateBlock(b, builder);
 					
-					builder.getWorld().playSound(b.getLocation(), Sound.BLOCK_GRAVEL_STEP, 0.5f, 1);
+					Sound sound = Sound.BLOCK_GRASS_STEP;
+					
+					Random rand = new Random();
+					int sx = rand.nextInt(5) + 1;
+					switch (sx) {
+					case 1:
+						sound = Sound.BLOCK_GRAVEL_STEP;
+						break;
+					case 2:
+						sound = Sound.BLOCK_GLASS_STEP;
+						break;
+					case 3:
+						sound = Sound.BLOCK_STONE_STEP;
+						break;
+					case 4:
+						sound = Sound.BLOCK_WOOD_STEP;
+						break;
+					case 5:
+						sound = Sound.BLOCK_METAL_STEP;
+						break;
+					}
+					builder.getWorld().playSound(b.getLocation(), sound, 0.5f, 1);
 				}			
 			}
 		}.runTaskTimer(Main.plugin, 1, (long) buildTime/scheduledBlocks.size()*20);
 		dealWithSpecialBlock();
 	}
 	private void dealWithSpecialBlock() {
-		if (!specialBlock.equals(null)) {
-			
-		}
+		
 	}
 }
