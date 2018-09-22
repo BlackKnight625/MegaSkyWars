@@ -11,9 +11,9 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <folder path="/MegaSkywars/lib"/>
         <file path="/MegaSkywars/.classpath"/>
         <javaElement handleIdentifier="=MegaSkywars/src"/>
+        <folder path="/MegaSkywars/.settings"/>
         <file path="/MegaSkywars/.project"/>
         <file path="/MegaSkywars/plugin.yml"/>
         <file path="/MegaSkywars/SaveAll.jardesc"/>

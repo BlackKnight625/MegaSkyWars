@@ -33,15 +33,25 @@ public enum StructureType {
 	
 	private boolean teamBuild;
 	private double buildTime;
+	private int size = 0;
 	
 	StructureType(boolean teamBuild, double buildTime) {
 		this.teamBuild = teamBuild;
 		this.buildTime = buildTime;
 	}
+	StructureType(boolean teamBuild, double buildTime, int size) {
+		this.teamBuild = teamBuild;
+		this.buildTime = buildTime;
+		this.size = size;
+	}
+	
 	public boolean isTeamBuild() {
 		return teamBuild;
 	}
 	public double buildTime() {
 		return buildTime;
+	}
+	public int getSize() {
+		return size;
 	}
 }

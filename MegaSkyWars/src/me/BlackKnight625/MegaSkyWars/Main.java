@@ -1,6 +1,8 @@
 package me.BlackKnight625.MegaSkyWars;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -49,69 +51,100 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@SuppressWarnings({ "unused", "deprecation" })
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		String c = cmd.getName();
-		int ammount = args.length;
-		boolean hasArgs = ammount >= 1;
-		boolean isPlayer = sender instanceof Player;
-		if (c.equalsIgnoreCase("oi")) {
-			if (isPlayer) {
-				try {
-					Structure tower = new Structure(StructureType.ARCHER_TOWER_2, (Player) sender);
-					return true;
-				} catch (ArithmeticException e) {
-					sender.sendMessage("You are not in a team");
-					return false;
-				} catch (Exception e) {
-					e.printStackTrace();
+		
+		if (sender.isOp()) {
+			String c = cmd.getName();
+			int ammount = args.length;
+			boolean hasArgs = ammount >= 1;
+			boolean isPlayer = sender instanceof Player;
+			if (c.equalsIgnoreCase("oi")) {
+				if (isPlayer) {
+					try {
+						Structure tower = new Structure(StructureType.ARCHER_TOWER_1, (Player) sender);
+						return true;
+					} catch (ArithmeticException e) {
+						sender.sendMessage("You are not in a team");
+						return false;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
+				else {sender.sendMessage("Sender must be a player!"); return false;}
 			}
-			else {sender.sendMessage("Sender must be a player!"); return false;}
-		}
-		else if (c.equalsIgnoreCase("team")) {
-				Player player = null;
-				
-				if (ammount >= 2 && args[0].equalsIgnoreCase("join") && isPlayer) {
-					player = (Player) sender;
-					if (Team.playerIsInATeam(player)) {
-						Team team = Team.getTeamOfPlayer(player);
-						team.removePlayer(player);
-					}
-					for (Team team : Team.teams) {
-						if (args[1].equalsIgnoreCase(team.getColor().toString())) {
-							team.addPlayer(player);
-							return true;
+			else if (c.equalsIgnoreCase("team")) {
+					Player player = null;
+					
+					if (ammount >= 2 && args[0].equalsIgnoreCase("join") && isPlayer) {
+						player = (Player) sender;
+						if (Team.playerIsInATeam(player)) {
+							Team team = Team.getTeamOfPlayer(player);
+							team.removePlayer(player);
 						}
-					}
-					sender.sendMessage("Invalid team color!");
-					return false;
-				}
-				else if (ammount >= 3 && args[1].equalsIgnoreCase("join")) {
-					for (Player p : Bukkit.getOnlinePlayers()) {
-						if (p.getName().equalsIgnoreCase(args[0])) {
-							player = Bukkit.getPlayer(args[0]);
+						for (Team team : Team.teams) {
+							if (args[1].equalsIgnoreCase(team.getColor().toString())) {
+								team.addPlayer(player);
+								return true;
+							}
 						}
-					}
-					if (player == null) {
-						sender.sendMessage("Specified player is not online!");
+						sender.sendMessage("Invalid team color!");
 						return false;
 					}
-					if (Team.playerIsInATeam(player)) {
-						Team team = Team.getTeamOfPlayer(player);
-						team.removePlayer(player);
+					else if (ammount >= 3 && args[1].equalsIgnoreCase("join")) {
+						for (Player p : Bukkit.getOnlinePlayers()) {
+							if (p.getName().equalsIgnoreCase(args[0])) {
+								player = Bukkit.getPlayer(args[0]);
+							}
+						}
+						if (player == null) {
+							sender.sendMessage("Specified player is not online!");
+							return false;
+						}
+						if (Team.playerIsInATeam(player)) {
+							Team team = Team.getTeamOfPlayer(player);
+							team.removePlayer(player);
+						}
+						for (Team team : Team.teams) {
+							if (args[2].equalsIgnoreCase(team.getColor().toString())) {
+								team.addPlayer(player);
+								return true;
+							}
+						}
+						sender.sendMessage("Invalid team color!");
+						return false;
 					}
-					for (Team team : Team.teams) {
-						if (args[2].equalsIgnoreCase(team.getColor().toString())) {
-							team.addPlayer(player);
-							return true;
+					else {return false;}
+				
+			}
+			else if (c.equalsIgnoreCase("structure")) {
+				if (isPlayer) {
+					if (hasArgs) {
+						Stream<StructureType> values = Arrays.stream(StructureType.values());
+						if (values.anyMatch(v -> v.toString().equalsIgnoreCase(args[0]))) {
+							try {
+								Structure tower = new Structure(StructureType.valueOf(args[0]), (Player) sender);
+								return true;
+							} catch (ArithmeticException e) {
+								sender.sendMessage("You are not in a team");
+								return false;
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
 					}
-					sender.sendMessage("Invalid team color!");
-					return false;
+					else {
+						sender.sendMessage("Not enough parameters!");
+						return false;
+					}
 				}
-				else {return false;}
-			
+				sender.sendMessage("You must be a player to perform this command");
+				return false;
+			}
+			return false;
 		}
-		return false;
+		else {
+			sender.sendMessage("You are not allowed to use this command!");
+			return false;
+		}
 	}
 	
 	public static void setMetadata(Metadatable object, String key, Object value) {

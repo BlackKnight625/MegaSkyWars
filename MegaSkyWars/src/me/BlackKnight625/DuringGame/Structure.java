@@ -12,6 +12,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Colorable;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.block.data.Directional;
 import org.bukkit.util.Vector;
@@ -20,7 +23,7 @@ import me.BlackKnight625.MegaSkyWars.Main;
 import me.BlackKnight625.MegaSkyWars.Utilities;
 //import sun.security.action.GetLongAction;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "deprecation" })
 public class Structure {
 	
 	private StructureType structureType;
@@ -118,6 +121,18 @@ public class Structure {
 		case STONE_BRIDGE:
 			break;
 		case STONE_BRIDGGE_DIAGONAL:
+			x1 = 10;
+			y1 = 4;
+			z1 = 17;
+			
+			x2 = 16;
+			y2 = 6;
+			z2 = 23;
+			
+			
+			downwards = 2;
+			farAway = 1;
+			diagonalStructure = true;
 			break;
 		case TNT_CANNON_1:
 			break;
@@ -160,6 +175,7 @@ public class Structure {
 	
 	private void build() {
 		String dir = Utilities.getCardinalDirection(builder);
+		String dirDia = Utilities.getDiagonalCardinalDirection(builder);
 		int x = 0, y = 0, z = 0, relX = 0, relY = 0, relZ = 0;
 		int playerX = builder.getLocation().getBlockX();
 		int playerY = builder.getLocation().getBlockY();
@@ -181,24 +197,47 @@ public class Structure {
 			relY = b.getY() -firstBlock.getY() - this.downwards;
 			relZ = b.getZ() -firstBlock.getZ() + this.farAway;
 
-			switch (dir) {
-			case "S":
-				x = relX + playerX;
-				z = relZ + playerZ;
-				break;
-			case "W":
-				z = relX + playerZ;
-				x = -relZ + playerX;
-				break;
-			case "N":
-				x = -relX + playerX;
-				z = -relZ + playerZ;
-				break;
-			case "E":
-				z = -relX + playerZ;
-				x = relZ + playerX;
-				break;
+			if (diagonalStructure) {
+				relX = b.getX() -firstBlock.getX() + 1;
+				switch (dirDia) {
+				case "SE":
+					x = relX + playerX;
+					z = relZ + playerZ;
+					break;
+				case "SW":
+					z = relX + playerZ;
+					x = -relZ + playerX;
+					break;
+				case "NW":
+					x = -relX + playerX;
+					z = -relZ + playerZ;
+					break;
+				case "NE":
+					z = -relX + playerZ;
+					x = relZ + playerX;
+					break;
+				}
+			} else {
+				switch (dir) {
+				case "S":
+					x = relX + playerX;
+					z = relZ + playerZ;
+					break;
+				case "W":
+					z = relX + playerZ;
+					x = -relZ + playerX;
+					break;
+				case "N":
+					x = -relX + playerX;
+					z = -relZ + playerZ;
+					break;
+				case "E":
+					z = -relX + playerZ;
+					x = relZ + playerX;
+					break;
+				}
 			}
+			
 			
 			y = relY + playerY;
 
@@ -227,6 +266,18 @@ public class Structure {
 					Block b = l.getBlock();
 					b.setType(block.getType());
 					b.setBlockData(block.getBlockData());
+					
+					if (b.getType().toString().contains("WOOL")) {
+						b.setType(Material.valueOf(color.toString() + "_WOOL"));
+					}
+					else if (b.getType().toString().contains("CONCRETE")) {
+						b.setType(Material.valueOf(color.toString() + "_CONCRETE"));
+					}
+					else if (b.getType().toString().contains("TERRACOTA")) {
+						b.setType(Material.valueOf(color.toString() + "_TERRACOTA"));
+					}
+					
+					
 					Utilities.rotateBlock(b, builder);
 					
 					Sound sound = Sound.BLOCK_GRASS_STEP;

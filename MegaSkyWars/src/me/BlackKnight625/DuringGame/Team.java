@@ -3,6 +3,7 @@ package me.BlackKnight625.DuringGame;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.Metadatable;
 
@@ -202,6 +203,9 @@ public class Team {
 		default:
 			return ChatColor.GREEN;
 		}
+	}
+	public static DyeColor getDyeColorOfTeam(TeamColor color) {
+		return DyeColor.valueOf(color.toString());
 	}
 	
 	public static void registerTeams() {
