@@ -13,6 +13,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Dispenser;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Banner;
@@ -30,6 +31,8 @@ import me.BlackKnight625.MegaSkyWars.Utilities;
 @SuppressWarnings({ "unused", "deprecation" })
 public class Structure {
 	
+
+	
 	private StructureType structureType;
 	private Player builder;
 	private TeamColor color;
@@ -39,6 +42,8 @@ public class Structure {
 	private Material specialBlock = null; //Defined in handle
 	private String specialBlockKey; //Defined in handle
 	private double specialBlockValue; //Defined in handle
+	private String specialBlockKey2; //Defined in handle
+	private int specialBlockValue2; //Defined in handle
 	private ArrayList<Block> blocks = new ArrayList<Block>();
 	private ArrayList<Block> scheduledBlocks = new ArrayList<Block>();
 	private ArrayList<Location> scheduledBlocksLoc = new ArrayList<Location>();
@@ -55,9 +60,6 @@ public class Structure {
 		team = Team.getTeamOfPlayer(player);
 		color = Team.getPlayerTeamColor(player);
 		handleStructureType();
-		if (specialBlock != null) {
-			handleSpecialBlocks(specialBlockKey, specialBlockValue);
-		}
 		
 		build();
 	}
@@ -144,7 +146,9 @@ public class Structure {
 			farAway = 1;
 			downwards = 0;
 			specialBlockKey = "Spawner";
+			specialBlockKey2 = "Monster";
 			specialBlockValue = 10;
+			specialBlockValue = 1;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_2:
@@ -159,7 +163,9 @@ public class Structure {
 			farAway = 1;
 			downwards = 0;
 			specialBlockKey = "Spawner";
+			specialBlockKey2 = "Monster";
 			specialBlockValue = 11;
+			specialBlockValue = 2;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_3:
@@ -174,7 +180,9 @@ public class Structure {
 			farAway = 1;
 			downwards = 0;
 			specialBlockKey = "Spawner";
+			specialBlockKey2 = "Monster";
 			specialBlockValue = 12;
+			specialBlockValue = 3;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_4:
@@ -189,7 +197,9 @@ public class Structure {
 			farAway = 1;
 			downwards = 0;
 			specialBlockKey = "Spawner";
+			specialBlockKey2 = "Monster";
 			specialBlockValue = 13;
+			specialBlockValue = 4;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_5:
@@ -204,7 +214,9 @@ public class Structure {
 			farAway = 1;
 			downwards = 0;
 			specialBlockKey = "Spawner";
-			specialBlockValue = 11;
+			specialBlockKey2 = "Monster";
+			specialBlockValue = 100;
+			specialBlockValue = 5;
 			specialBlock = Material.SPAWNER;
 			break;
 		case POWER_STATION_1:
@@ -462,10 +474,6 @@ public class Structure {
 	}
 
 	
-	private void handleSpecialBlocks(String key, double specialBlockValue2) {
-		
-	}
-	
 	private void build() {
 		String dir = Utilities.getCardinalDirection(builder);
 		String dirDia = Utilities.getDiagonalCardinalDirection(builder);
@@ -592,6 +600,7 @@ public class Structure {
 					}
 					
 					Utilities.rotateBlock(b, dir);
+					dealWithSpecialBlock(b);
 					
 					if (b.getType().toString().contains("FENCE")) {
 						
@@ -624,9 +633,20 @@ public class Structure {
 				}			
 			}
 		}.runTaskTimer(Main.plugin, 1, (long) buildTime/scheduledBlocks.size()*20);
-		dealWithSpecialBlock();
-	}
-	private void dealWithSpecialBlock() {
 		
+	}
+	private void dealWithSpecialBlock(Block b) {
+		if (b.getType().equals(specialBlock)) {
+			Team.setTeamColorToObject(b, color);
+			if (b.getType().equals(Material.SPAWNER)) {
+				Main.setMetadata(b, specialBlockKey, specialBlockValue);
+				Main.setMetadata(b, specialBlockKey2, specialBlockValue2);
+				team.monsterSpawners.add(b);
+			}
+			else if (b.getType().equals(Material.REDSTONE_BLOCK)) {
+				Main.setMetadata(b, specialBlockKey, specialBlockValue);
+				team.powerBlocks.add(b);
+			}
+		}
 	}
 }

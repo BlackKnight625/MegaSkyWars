@@ -2,8 +2,14 @@ package me.BlackKnight625.DuringGame;
 
 import java.util.ArrayList;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.Metadatable;
 
@@ -18,6 +24,12 @@ public class Team {
 	private ChatColor chatColor;
 	private TeamColor color;
 	private ArrayList<Player> playersInATeam = new ArrayList<Player>();
+	@SuppressWarnings("unused")
+	private Location witherLocation;
+	
+	public ArrayList<Block> monsterSpawners = new ArrayList<Block>();
+	public ArrayList<Block> powerBlocks = new ArrayList<Block>();
+	public ArrayList<Monster> friendlyMobs = new ArrayList<Monster>();
 	
 	public static ArrayList<Team> teams = new ArrayList<Team>();
 	
@@ -99,7 +111,7 @@ public class Team {
 	}
 	
 	public static boolean playerIsInTeam(Player p, TeamColor color) {
-		if (p.hasMetadata("Team")) {
+		if (p.hasMetadata("Team") && Main.getMetadata(p, "Team") != null) {
 			if (Main.getMetadata(p, "Team").equals(color)) {
 				return true;
 			}
@@ -108,13 +120,13 @@ public class Team {
 		else {return false;}
 	}
 	public static boolean playerIsInATeam(Player p) {
-		if (p.hasMetadata("Team")) {
+		if (p.hasMetadata("Team") && Main.getMetadata(p, "Team") != null) {
 			return true;
 		}
 		return false;
 	}
 	public static boolean playerIsInSameTeamAs(Player p1, Player p2) {
-		if (p1.hasMetadata("Team") && p2.hasMetadata("Team")) {
+		if (p1.hasMetadata("Team") && Main.getMetadata(p1, "Team") != null && p2.hasMetadata("Team") && Main.getMetadata(p2, "Team") != null) {
 			TeamColor c1 = (TeamColor) Main.getMetadata(p1, "Team");
 			TeamColor c2 = (TeamColor) Main.getMetadata(p2, "Team");
 			if (c1.equals(c2)) {
@@ -135,13 +147,13 @@ public class Team {
 		Main.setMetadata(o, "Team", color);
 	}
 	public static boolean objectIsInATeam(Metadatable o) {
-		if (o.hasMetadata("Team")) {
+		if (o.hasMetadata("Team") && Main.getMetadata(o, "Team") != null) {
 			return true;
 		}
 		return false;
 	}
 	public static boolean objectIsInSameTeamAs(Metadatable o1, Metadatable o2) {
-		if (o1.hasMetadata("Team") && o2.hasMetadata("Team")) {
+		if (o1.hasMetadata("Team") && Main.getMetadata(o1, "Team") != null && o2.hasMetadata("Team") && Main.getMetadata(o2, "Team") != null) {
 			TeamColor c1 = (TeamColor) Main.getMetadata(o1, "Team");
 			TeamColor c2 = (TeamColor) Main.getMetadata(o2, "Team");
 			if (c1.equals(c2)) {
@@ -221,6 +233,19 @@ public class Team {
 			
 			Team team = new Team(c);
 			teams.add(team);
+			for (World w : Bukkit.getWorlds()) {
+				for (Entity e : w.getEntities()) {
+					if (e.hasMetadata("Team")) {
+						String name = e.getCustomName();
+						for (Team te : Team.teams) {
+							if (name.toLowerCase().contains(team.getColor().toLowerCase())) {
+								te.friendlyMobs.add((Monster) e);
+								Main.setMetadata(e, "Team", team.getTeamColor());
+							}
+						}					
+					}
+				}
+			}
 		}
 		
 	}
@@ -246,5 +271,20 @@ public class Team {
 		}
 		return null;
 	}
-	
+	public static Team getTeamOfChatColor(ChatColor c) {
+		for (Team team : teams) {
+			if (team.getChatColor().equals(c)) {
+				return team;
+			}
+		}
+		return null;
+	}
+	public static Team getTeamOfString(String c) {
+		for (Team team : teams) {
+			if (team.getColor().equals(c)) {
+				return team;
+			}
+		}
+		return null;
+	}
 }

@@ -1,14 +1,23 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+
+import me.BlackKnight625.DuringGame.Team;
+import me.BlackKnight625.DuringGame.TeamColor;
 
 
 public class Utilities {
@@ -293,4 +302,306 @@ public class Utilities {
 			}
 		
 	}
+
+	public static void createFriendlyTeamMob(Team team, EntityType type, Location loc) {
+		Entity e = loc.getWorld().spawnEntity(loc, type);		
+		Monster m = (Monster) e;
+		Main.setMetadata(m, "Team", team.getTeamColor());
+		m.setCanPickupItems(true);
+		char name1 = team.getColor().charAt(0);
+		String name2 = team.getColor().substring(1).toLowerCase();
+		char name3 = m.getType().toString().charAt(0);
+		String name4 = m.getType().toString().substring(1).toLowerCase();
+		m.setCustomName(team.getChatColor() + "" + name1 + name2 + ": " + name3 + name4);
+		team.friendlyMobs.add(m);
+	}
+	
+	public static Player getClosestPlayer(Location l, double radius) {
+		double closest = radius;
+		Player closestp = null;
+		for(Player i : Bukkit.getOnlinePlayers()){
+			double dist = i.getLocation().distance(l);
+			if (closest == Double.MAX_VALUE || dist < closest){
+				closest = dist;
+				closestp = i;
+	  	}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	public static Player getClosestEnemyPlayer(Location l, Team team, double radius) {
+		TeamColor color = team.getTeamColor();
+		double closest = radius;
+		Player closestp = null;
+		for(Player i : Bukkit.getOnlinePlayers()){
+			if (Team.playerIsInATeam(i)) {
+				double dist = i.getLocation().distance(l);
+				if (closest == Double.MAX_VALUE || dist < closest) {
+					if (!Team.getTeamOfPlayer(i).getTeamColor().equals(color)) {
+						closest = dist;
+						closestp = i;
+					}
+				} 
+			}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	public static Player getClosestAllyPlayer(Location l, Team team, double radius) {
+		TeamColor color = team.getTeamColor();
+		double closest = radius;
+		Player closestp = null;
+		for(Player i : Bukkit.getOnlinePlayers()){
+			if (Team.playerIsInATeam(i)) {
+				double dist = i.getLocation().distance(l);
+				if (closest == Double.MAX_VALUE || dist < closest) {
+					if (Team.getTeamOfPlayer(i).getTeamColor().equals(color)) {
+						closest = dist;
+						closestp = i;
+					}
+				} 
+			}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	
+	public static LivingEntity getClosestLivingEntity(Location l, double radius) {
+		double closest = radius;
+		LivingEntity closestp = null;
+		for(LivingEntity i : l.getWorld().getLivingEntities()){
+			if (!i.getType().equals(EntityType.PLAYER)) {
+				double dist = i.getLocation().distance(l);
+				if (closest == Double.MAX_VALUE || dist < closest) {
+					closest = dist;
+					closestp = i;
+				} 
+			}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	public static LivingEntity getClosestEnemyLivingEntity(Location l, Team team, double radius) {
+		TeamColor color = team.getTeamColor();
+		double closest = radius;
+		LivingEntity closestp = null;
+		for(LivingEntity i : l.getWorld().getLivingEntities()){
+			if ((Team.objectIsInATeam(i) && !Team.getTeamColorOfObject(i).equals(color)) || !Team.objectIsInATeam(i) && !i.getType().equals(EntityType.PLAYER)) {
+				double dist = i.getLocation().distance(l);
+				if (closest == Double.MAX_VALUE || dist < closest) {
+						closest = dist;
+						closestp = i;
+					
+				} 
+			}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	public static LivingEntity getClosestAllyLivingEntity(Location l, Team team, double radius) {
+		TeamColor color = team.getTeamColor();
+		double closest = radius;
+		LivingEntity closestp = null;
+		for(LivingEntity i : l.getWorld().getLivingEntities()){
+			if (Team.objectIsInATeam(i) && !i.getType().equals(EntityType.PLAYER)) {
+				double dist = i.getLocation().distance(l);
+				if (closest == Double.MAX_VALUE || dist < closest) {
+					if (Team.getTeamColorOfObject(i).equals(color)) {
+						closest = dist;
+						closestp = i;
+					}
+				} 
+			}
+		}
+		if (closestp == null){
+		  return null;
+		}
+		else{
+		  return closestp;
+		}
+	}
+	
+	//Depends on the Player's necromancer level
+	public static EntityType getEntityTypeDependingOnNecromancerLevel(int level) {
+		EntityType e = EntityType.ZOMBIE;
+		Random rand = new Random();
+		int odds = rand.nextInt(1000) + 1;
+		switch (level) {
+		case 1:
+			if (odds <= 500) {
+				e = EntityType.SKELETON;
+				break;
+			}
+		case 2:
+			if (odds <= 400) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 600) {
+				e = EntityType.SPIDER;
+				break;
+			}
+		case 4:
+			if (odds <= 350) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 550) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 650) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+		case 5:
+			if (odds <= 350) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 450) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 550) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+			if (odds <= 650) {
+				e = EntityType.GUARDIAN;
+				break;
+			}
+		case 6:
+			if (odds <= 350) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 420) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 490) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+			if (odds <= 590) {
+				e = EntityType.GUARDIAN;
+				break;
+			}
+			if (odds <= 650) {
+				e = EntityType.VEX;
+				break;
+			}
+		case 7:
+			if (odds <= 350) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 410) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 470) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+			if (odds <= 530) {
+				e = EntityType.GUARDIAN;
+				break;
+			}
+			if (odds <= 590) {
+				e = EntityType.VEX;
+				break;
+			}
+			if (odds <= 650) {
+				e = EntityType.BLAZE;
+				break;
+			}
+		case 8:
+			if (odds <= 350) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 400) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 450) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+			if (odds <= 500) {
+				e = EntityType.GUARDIAN;
+				break;
+			}
+			if (odds <= 550) {
+				e = EntityType.VEX;
+				break;
+			}
+			if (odds <= 600) {
+				e = EntityType.BLAZE;
+				break;
+			}
+			if (odds <= 650) {
+				e = EntityType.WITHER_SKELETON;
+				break;
+			}
+		case 9:
+			if (odds <= 325) {
+				e = EntityType.SKELETON;
+				break;
+			}
+			if (odds <= 375) {
+				e = EntityType.SPIDER;
+				break;
+			}
+			if (odds <= 425) {
+				e = EntityType.CAVE_SPIDER;
+				break;
+			}
+			if (odds <= 475) {
+				e = EntityType.GUARDIAN;
+				break;
+			}
+			if (odds <= 525) {
+				e = EntityType.VEX;
+				break;
+			}
+			if (odds <= 575) {
+				e = EntityType.BLAZE;
+				break;
+			}
+			if (odds <= 625) {
+				e = EntityType.WITHER_SKELETON;
+				break;
+			}
+			if (odds <= 675) {
+				e = EntityType.ENDERMAN;
+				break;
+			}
+		}	
+		return e;
+	}
+
+
 }

@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -32,6 +36,12 @@ public class Main extends JavaPlugin implements Listener {
 	public void onEnable() {
 		plugin = this;
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
+		new EventsHandler(this);
+		
+		
+		
+		
+		
 		scoreboard = getServer().getScoreboardManager().getMainScoreboard();
 		new BukkitRunnable() {
 			
@@ -40,13 +50,50 @@ public class Main extends JavaPlugin implements Listener {
 				Team.registerTeams();
 			}
 		}.runTaskLater(plugin, 2);
+			
+
+		
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				for (Team team : Team.getTeams()) {
+					if (!team.friendlyMobs.isEmpty()) {
+						for (Monster mob : team.friendlyMobs) {
+							
+								Player player = Utilities.getClosestEnemyPlayer(mob.getLocation(), team, 20);
+								LivingEntity entity = Utilities.getClosestEnemyLivingEntity(mob.getLocation(), team, 20);
+								
+								if (entity != null) {
+									mob.setTarget(entity);
+								}
+								else if (player != null && (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE))) {
+									mob.setTarget(player);
+								}
+								else {
+									mob.setTarget(null);
+								}
+							
+						}
+					}
+				}
+				
+			}
+		}.runTaskTimer(this, 10, 10);
 	}
 	public void onDisable() {
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			if (p.hasMetadata("Team")) {
 				p.removeMetadata("Team", plugin);
+				
 			}
 		}
+		for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
+			if (((Metadatable) p).hasMetadata("Team")) {
+				((Metadatable) p).removeMetadata("Team", plugin);
+			}
+		}
+		
 	}
 	
 	@SuppressWarnings({ "unused", "deprecation" })
@@ -59,14 +106,10 @@ public class Main extends JavaPlugin implements Listener {
 			boolean isPlayer = sender instanceof Player;
 			if (c.equalsIgnoreCase("oi")) {
 				if (isPlayer) {
-					try {
-						Structure tower = new Structure(StructureType.ARCHER_TOWER_1, (Player) sender);
+					Player p = (Player) sender;
+					if (Team.playerIsInATeam(p)) {
+						Utilities.createFriendlyTeamMob(Team.getTeamOfPlayer(p), Utilities.getEntityTypeDependingOnNecromancerLevel(9), p.getLocation());
 						return true;
-					} catch (ArithmeticException e) {
-						sender.sendMessage("You are not in a team");
-						return false;
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
