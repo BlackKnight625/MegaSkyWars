@@ -5,13 +5,17 @@ import java.util.Iterator;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Banner;
 import org.bukkit.material.Colorable;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
@@ -30,17 +34,17 @@ public class Structure {
 	private Player builder;
 	private TeamColor color;
 	private Team team;
-	private double buildTime = 1;
-	private boolean teamBuild = false;
-	private Block specialBlock = null;
-	private String specialBlockKey;
-	private int specialBlockValue;
+	private double buildTime = 1; //Defined in StructureType
+	private boolean teamBuild = false; //Defined in StructureType
+	private Material specialBlock = null; //Defined in handle
+	private String specialBlockKey; //Defined in handle
+	private double specialBlockValue; //Defined in handle
 	private ArrayList<Block> blocks = new ArrayList<Block>();
 	private ArrayList<Block> scheduledBlocks = new ArrayList<Block>();
 	private ArrayList<Location> scheduledBlocksLoc = new ArrayList<Location>();
-	private int farAway = 1;
-	private int downwards = 1;
-	private boolean diagonalStructure = false;
+	private int farAway = 1; //Defined in handle
+	private int downwards = 0; //Defined in handle
+	private boolean diagonalStructure = false; //Defined in handle
 	
 	public Structure(StructureType type, Player player) throws Exception {
 		if (!Team.playerIsInATeam(player)) {
@@ -57,6 +61,7 @@ public class Structure {
 		
 		build();
 	}
+	
 	private void handleStructureType() {
 		int x1 = 0;
 		int y1 = 0;
@@ -77,6 +82,7 @@ public class Structure {
 			z2 = 13;
 			
 			farAway = 2;
+			downwards = 1;
 			break;
 		case ARCHER_TOWER_2:
 			x1 = -3;
@@ -87,40 +93,202 @@ public class Structure {
 			y2 = 10;
 			z2 = 15;
 			
-			farAway = 2;
+			farAway = 1;
+			downwards = 1;
 			break;
 		case ARCHER_TOWER_3:
+			x1 = -16;
+			y1 = 3;
+			z1 = 7;
+			
+			x2 = -6;
+			y2 = 14;
+			z2 = 17;
+			
+			farAway = 1;
+			downwards = 1;
 			break;
 		case FORGE:
+			x1 = 5;
+			y1 = 3;
+			z1 = 18;
+			
+			x2 = 7;
+			y2 = 6;
+			z2 = 20;
+			
+			farAway = 1;
+			downwards = 1;
 			break;
 		case LADDER:
+			x1 = 26;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 26;
+			y2 = 11;
+			z2 = 8;
+			
+			farAway = 0;
+			downwards = 0;
 			break;
 		case NECROMANCER_PIT_1:
-			teamBuild = true;
+			x1 = 137;
+			y1 = 4;
+			z1 = 7;
+			
+			x2 = 143;
+			y2 = 11;
+			z2 = 14;
+			
+			farAway = 1;
+			downwards = 0;
 			specialBlockKey = "Spawner";
 			specialBlockValue = 10;
+			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_2:
+			x1 = 146;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 156;
+			y2 = 14;
+			z2 = 17;
+			
+			farAway = 1;
+			downwards = 0;
+			specialBlockKey = "Spawner";
+			specialBlockValue = 11;
+			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_3:
+			x1 = 160;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 170;
+			y2 = 14;
+			z2 = 17;
+			
+			farAway = 1;
+			downwards = 0;
+			specialBlockKey = "Spawner";
+			specialBlockValue = 12;
+			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_4:
+			x1 = 175;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 187;
+			y2 = 18;
+			z2 = 20;
+			
+			farAway = 1;
+			downwards = 0;
+			specialBlockKey = "Spawner";
+			specialBlockValue = 13;
+			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_5:
+			x1 = 189;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 207;
+			y2 = 21;
+			z2 = 21;
+			
+			farAway = 1;
+			downwards = 0;
+			specialBlockKey = "Spawner";
+			specialBlockValue = 11;
+			specialBlock = Material.SPAWNER;
 			break;
 		case POWER_STATION_1:
+			x1 = 101;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 109;
+			y2 = 19;
+			z2 = 14;
+			
+			farAway = 0;
+			downwards = 0;
+			specialBlockKey = "Power Station";
+			specialBlockValue = 1.2;
+			specialBlock = Material.REDSTONE_BLOCK;
 			break;
 		case POWER_STATION_2:
+			x1 = 113;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 121;
+			y2 = 20;
+			z2 = 14;
+			
+			farAway = 0;
+			downwards = 0;
+			specialBlockKey = "Power Station";
+			specialBlockValue = 1.25;
+			specialBlock = Material.REDSTONE_BLOCK;
 			break;
 		case POWER_STATION_3:
+			x1 = 124;
+			y1 = 4;
+			z1 = 4;
+			
+			x2 = 136;
+			y2 = 24;
+			z2 = 16;
+			
+			farAway = 0;
+			downwards = 0;
+			specialBlockKey = "Power Station";
+			specialBlockValue = 1.3;
+			specialBlock = Material.REDSTONE_BLOCK;
 			break;
 		case RAILWAY:
+			x1 = 96;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 98;
+			y2 = 7;
+			z2 = 22;
+			
+			farAway = 1;
+			downwards = 2;
 			break;
 		case STAIRCASE:
+			x1 = 24;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 24;
+			y2 = 16;
+			z2 = 13;
+			
+			farAway = 0;
+			downwards = 4;
 			break;
 		case STONE_BRIDGE:
+			x1 = 16;
+			y1 = 4;
+			z1 = 7;
+			
+			x2 = 16;
+			y2 = 6;
+			z2 = 14;
+			
+			farAway = 1;
+			downwards = 2;
 			break;
-		case STONE_BRIDGGE_DIAGONAL:
+		case STONE_BRIDGE_DIAGONAL:
 			x1 = 10;
 			y1 = 4;
 			z1 = 17;
@@ -129,34 +297,162 @@ public class Structure {
 			y2 = 6;
 			z2 = 23;
 			
-			
-			downwards = 2;
 			farAway = 1;
+			downwards = 2;
 			diagonalStructure = true;
 			break;
 		case TNT_CANNON_1:
+			x1 = 70;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 72;
+			y2 = 7;
+			z2 = 13;
+			
+			farAway = 0;
+			downwards = 0;
 			break;
 		case TNT_CANNON_2:
+			x1 = 74;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 78;
+			y2 = 8;
+			z2 = 13;
+			
+			farAway = 0;
+			downwards = 0;
 			break;
 		case TNT_CANNON_3:
+			x1 = 89;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 93;
+			y2 = 9;
+			z2 = 17;
+			
+			farAway = 0;
+			downwards = 0;
 			break;
 		case TNT_CANNON_LOW:
+			x1 = 83;
+			y1 = 4;
+			z1 = 3;
+			
+			x2 = 85;
+			y2 = 10;
+			z2 = 14;
+			
+			farAway = -3;
+			downwards = 0;
 			break;
 		case WALL_5X5:
+			x1 = 29;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 33;
+			y2 = 10;
+			z2 = 9;
+			
+			specialBlock = Material.STONE_BRICKS;
+			farAway = 0;
+			downwards = 0;
 			break;
 		case WALL_7X5:
+			x1 = 35;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 41;
+			y2 = 10;
+			z2 = 9;
+			
+			specialBlock = Material.STONE_BRICKS;
+			farAway = 0;
+			downwards = 0;
 			break;
 		case WALL_7X6:
+			x1 = 43;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 49;
+			y2 = 11;
+			z2 = 9;
+			
+			specialBlock = Material.STONE_BRICKS;
+			farAway = 0;
+			downwards = 0;
 			break;
 		case WALL_7X7:
+			x1 = 51;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 57;
+			y2 = 12;
+			z2 = 9;
+			
+			specialBlock = Material.STONE_BRICKS;
+			farAway = 0;
+			downwards = 0;
 			break;
 		case WALL_9X7:
+			x1 = 59;
+			y1 = 4;
+			z1 = 5;
+			
+			x2 = 67;
+			y2 = 12;
+			z2 = 9;
+			
+			specialBlock = Material.STONE_BRICKS;
+			farAway = 0;
+			downwards = 0;
 			break;
 		case WOODEN_BRIDGE:
+			x1 = 18;
+			y1 = 4;
+			z1 = 7;
+			
+			x2 = 18;
+			y2 = 6;
+			z2 = 14;
+			
+			
+			farAway = 1;
+			downwards = 2;
 			break;
 		case WOODEN_BRIDGE_3X3:
+			x1 = 19;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 23;
+			y2 = 6;
+			z2 = 14;
+			
+			
+			farAway = 0;
+			downwards = 2;
 			break;
 		case WOODEN_BRIDGE_DIAGONAL:
+			x1 = 18;
+			y1 = 4;
+			z1 = 17;
+			
+			x2 = 24;
+			y2 = 6;
+			z2 = 23;
+			
+			
+			farAway = 1;
+			downwards = 2;
+			diagonalStructure = true;
 			break;
 		}
 		Block block1 = Bukkit.getWorld("Mega").getBlockAt(new Location(builder.getWorld(), x1, y1, z1));
@@ -164,12 +460,9 @@ public class Structure {
 		blocks = Utilities.getStructure(block1, block2);
 		
 	}
+
 	
-	
-	
-	
-	
-	private void handleSpecialBlocks(String key, int value) {
+	private void handleSpecialBlocks(String key, double specialBlockValue2) {
 		
 	}
 	
@@ -180,7 +473,6 @@ public class Structure {
 		int playerX = builder.getLocation().getBlockX();
 		int playerY = builder.getLocation().getBlockY();
 		int playerZ = builder.getLocation().getBlockZ();
-		int taskID = 0;
 		Vector moveAside;
 		
 		Block firstBlock = this.blocks.get(0);
@@ -244,7 +536,9 @@ public class Structure {
 			
 			final Location l = new Location(builder.getWorld(), x, y, z);
 
-			if (l.getBlock().getType().equals(Material.AIR)) {				
+			if (l.getBlock().getType().equals(Material.AIR)) {	
+				
+				
 				scheduledBlocks.add(b);	
 				scheduledBlocksLoc.add(l);
 			}
@@ -254,6 +548,7 @@ public class Structure {
 	private void placeBlocks(ArrayList<Block> blocks, ArrayList<Location> locs) {
 		Iterator<Block> itb = blocks.iterator();
 		Iterator<Location> itl = locs.iterator();
+		String dir = Utilities.getCardinalDirection(builder);
 		new BukkitRunnable() {	
 			@Override
 			public void run() {
@@ -264,6 +559,10 @@ public class Structure {
 					Block block = itb.next();
 					Location l = itl.next();
 					Block b = l.getBlock();
+					if (!(l.equals(builder.getLocation()) || l.equals(builder.getEyeLocation()))) {
+						
+					}
+					
 					b.setType(block.getType());
 					b.setBlockData(block.getBlockData());
 					
@@ -273,12 +572,22 @@ public class Structure {
 					else if (b.getType().toString().contains("CONCRETE")) {
 						b.setType(Material.valueOf(color.toString() + "_CONCRETE"));
 					}
-					else if (b.getType().toString().contains("TERRACOTA")) {
-						b.setType(Material.valueOf(color.toString() + "_TERRACOTA"));
+					else if (b.getType().toString().contains("TERRACOTTA")) {
+						b.setType(Material.valueOf(color.toString() + "_TERRACOTTA"));
+					}
+					else if (b.getType().toString().contains("BANNER")) {
+						b.setType(Material.valueOf(color.toString() + "_BANNER"));
 					}
 					
+					if (b.getType().equals(Material.DISPENSER)) {
+						Dispenser d = (Dispenser) b.getState();
+						ItemStack tnt = new ItemStack(Material.TNT, 3);
+						d.getInventory().addItem(tnt);
+					}
 					
-					Utilities.rotateBlock(b, builder);
+					Utilities.rotateBlock(b, dir);
+					
+					b.getState().update();
 					
 					Sound sound = Sound.BLOCK_GRASS_STEP;
 					
@@ -301,7 +610,7 @@ public class Structure {
 						sound = Sound.BLOCK_METAL_STEP;
 						break;
 					}
-					builder.getWorld().playSound(b.getLocation(), sound, 0.5f, 1);
+					builder.getWorld().playSound(b.getLocation(), sound, 0.5f, 1f);
 				}			
 			}
 		}.runTaskTimer(Main.plugin, 1, (long) buildTime/scheduledBlocks.size()*20);

@@ -130,9 +130,12 @@ public class Main extends JavaPlugin implements Listener {
 								e.printStackTrace();
 							}
 						}
+						sender.sendMessage("The name of the Structure must be written in caps! If that was the case,"
+								+ " then it does not exist! You must type one of the following: " + StructureType.intoString());
+						return false;
 					}
 					else {
-						sender.sendMessage("Not enough parameters!");
+						sender.sendMessage("Not enough parameters! You must type one of the following: " + StructureType.intoString());
 						return false;
 					}
 				}

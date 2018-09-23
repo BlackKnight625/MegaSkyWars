@@ -6,7 +6,7 @@ public enum StructureType {
 	ARCHER_TOWER_2 (true, 8),
 	ARCHER_TOWER_3 (true, 10),
 	STONE_BRIDGE (false, 2),
-	STONE_BRIDGGE_DIAGONAL (false, 2),
+	STONE_BRIDGE_DIAGONAL (false, 2),
 	WOODEN_BRIDGE (false, 2),
 	WOODEN_BRIDGE_DIAGONAL (false, 2),
 	WOODEN_BRIDGE_3X3 (false, 2),
@@ -53,5 +53,12 @@ public enum StructureType {
 	}
 	public int getSize() {
 		return size;
+	}
+	public static String intoString() {
+		String string = null;
+		for (StructureType s : StructureType.values()) {
+			string =  ((string == null) ? (" ") : (string + ", ")) + s;
+		}
+		return string;
 	}
 }

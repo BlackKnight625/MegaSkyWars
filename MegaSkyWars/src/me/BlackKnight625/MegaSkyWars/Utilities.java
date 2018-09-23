@@ -93,7 +93,7 @@ public class Utilities {
         l.getChunk().load();
         l = new Location(block1.getWorld(), maxX, minY, maxZ);
         l.getChunk().load();
-        l = new Location(block1.getWorld(), maxX, minY, maxZ);
+        l = new Location(block1.getWorld(), minX, minY, maxZ);
         l.getChunk().load();
         
         ArrayList<Block> blocks = new ArrayList<Block>();
@@ -105,7 +105,8 @@ public class Utilities {
                 for(int z = minZ; z <= maxZ; z++){
  
                     Block b = block1.getWorld().getBlockAt(x, y, z);              
-                    blocks.add(b);                          
+                    blocks.add(b);    
+                    
                 }
             }
         }
@@ -113,8 +114,7 @@ public class Utilities {
         return blocks;
  
     }
-	public static void rotateBlock(Block b, Player builder) {
-		String dir = Utilities.getCardinalDirection(builder);
+	public static void rotateBlock(Block b, String dir) {
 		BlockFace face = BlockFace.NORTH;		
 			if (b.getBlockData() instanceof Directional) {
 				Directional bl = (Directional) b.getBlockData();
@@ -179,6 +179,13 @@ public class Utilities {
 						face = BlockFace.WEST;
 					}
 				}	
+				else if (f.equals(BlockFace.UP)) {
+					face = BlockFace.UP;
+				}
+				else if (f.equals(BlockFace.DOWN)) {
+					face = BlockFace.DOWN;
+				}
+				
 				bl.setFacing(face);
 				b.setBlockData(bl);
 			}

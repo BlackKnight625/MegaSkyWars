@@ -15,3 +15,8 @@ commands:
       usage: /team (player) join TEAMCOLOR
       permission: <MegaSkyWars>.team
       permission-message: You don't have <permission>
+   structure:
+      description: Create a structure
+      usage: /structure STRUCTURETYPE
+      permission: <MegaSkyWars>.structure
+      permission-message: You don't have <permission>
