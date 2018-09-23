@@ -100,7 +100,7 @@ public class Team {
 	
 	public static boolean playerIsInTeam(Player p, TeamColor color) {
 		if (p.hasMetadata("Team")) {
-			if (p.getMetadata("Team").contains(color)) {
+			if (Main.getMetadata(p, "Team").equals(color)) {
 				return true;
 			}
 			return false;

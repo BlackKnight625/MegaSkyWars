@@ -262,7 +262,7 @@ public class Structure {
 			z2 = 22;
 			
 			farAway = 1;
-			downwards = 2;
+			downwards = 3;
 			break;
 		case STAIRCASE:
 			x1 = 24;
@@ -274,7 +274,7 @@ public class Structure {
 			z2 = 13;
 			
 			farAway = 0;
-			downwards = 4;
+			downwards = 5;
 			break;
 		case STONE_BRIDGE:
 			x1 = 16;
@@ -581,11 +581,21 @@ public class Structure {
 					
 					if (b.getType().equals(Material.DISPENSER)) {
 						Dispenser d = (Dispenser) b.getState();
-						ItemStack tnt = new ItemStack(Material.TNT, 3);
+						ItemStack tnt = new ItemStack(Material.TNT, 3);;
+						if (structureType.equals(StructureType.TNT_CANNON_3)) {
+							tnt = new ItemStack(Material.TNT, 4);
+						}
+						else if (structureType.equals(StructureType.TNT_CANNON_LOW)) {
+							tnt = new ItemStack(Material.TNT, 8);
+						}
 						d.getInventory().addItem(tnt);
 					}
 					
 					Utilities.rotateBlock(b, dir);
+					
+					if (b.getType().toString().contains("FENCE")) {
+						
+					}
 					
 					b.getState().update();
 					

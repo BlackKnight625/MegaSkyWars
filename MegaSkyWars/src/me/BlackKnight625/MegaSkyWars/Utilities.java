@@ -1,11 +1,13 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.MultipleFacing;
 import org.bukkit.entity.Player;
 
 
@@ -114,9 +116,9 @@ public class Utilities {
         return blocks;
  
     }
-	public static void rotateBlock(Block b, String dir) {
-		BlockFace face = BlockFace.NORTH;		
+	public static void rotateBlock(Block b, String dir) {			
 			if (b.getBlockData() instanceof Directional) {
+				BlockFace face = BlockFace.NORTH;
 				Directional bl = (Directional) b.getBlockData();
 				BlockFace f = bl.getFacing();
 				if (f.equals(BlockFace.SOUTH)) {
@@ -187,6 +189,106 @@ public class Utilities {
 				}
 				
 				bl.setFacing(face);
+				b.setBlockData(bl);
+			}
+			else if (b.getBlockData() instanceof MultipleFacing) {
+				MultipleFacing bl = (MultipleFacing) b.getBlockData();
+				Set<BlockFace> f = bl.getFaces();
+				BlockFace face = BlockFace.NORTH;
+				ArrayList<BlockFace> faces = new ArrayList<BlockFace>();
+				for (BlockFace fa : f) {
+					bl.setFace(fa, false);
+				}
+				
+				if (f.contains(BlockFace.SOUTH)) {
+					switch (dir) {
+					case "E":
+						face = BlockFace.EAST;
+						faces.add(face);
+						break;
+					case "W":
+						face = BlockFace.WEST;
+						faces.add(face);
+						break;
+					case "S":
+						face = BlockFace.SOUTH;
+						faces.add(face);
+						break;
+					case "N":
+						face = BlockFace.NORTH;
+						faces.add(face);
+					}
+				}
+				if (f.contains(BlockFace.WEST)) {
+					switch (dir) {
+					case "E":
+						face = BlockFace.SOUTH;
+						faces.add(face);
+						break;
+					case "W":
+						face = BlockFace.NORTH;
+						faces.add(face);
+						break;
+					case "S":
+						face = BlockFace.WEST;
+						faces.add(face);
+						break;
+					case "N":
+						face = BlockFace.EAST;
+						faces.add(face);
+					}
+				}
+				if (f.contains(BlockFace.NORTH)) {
+					switch (dir) {
+					case "E":
+						face = BlockFace.WEST;
+						faces.add(face);
+						break;
+					case "W":
+						face = BlockFace.EAST;
+						faces.add(face);
+						break;
+					case "S":
+						face = BlockFace.NORTH;
+						faces.add(face);
+						break;
+					case "N":
+						face = BlockFace.SOUTH;
+						faces.add(face);
+					}
+				}
+				if (f.contains(BlockFace.EAST)) {
+					switch (dir) {
+					case "E":
+						face = BlockFace.NORTH;
+						faces.add(face);
+						break;
+					case "W":
+						face = BlockFace.SOUTH;
+						faces.add(face);
+						break;
+					case "S":
+						face = BlockFace.EAST;
+						faces.add(face);
+						break;
+					case "N":
+						face = BlockFace.WEST;
+						faces.add(face);
+					}
+				}	
+				if (f.contains(BlockFace.UP)) {
+					face = BlockFace.UP;
+					faces.add(face);
+				}
+				if (f.contains(BlockFace.DOWN)) {
+					face = BlockFace.DOWN;
+					faces.add(face);
+				}
+				
+				for (BlockFace fa : faces) {
+					bl.setFace(fa, true);
+				}
+		
 				b.setBlockData(bl);
 			}
 		
