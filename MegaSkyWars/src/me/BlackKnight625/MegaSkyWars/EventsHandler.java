@@ -55,7 +55,7 @@ public final class EventsHandler implements Listener {
 	public void playerDieEvent(PlayerDeathEvent e) {
 		Random rand = new Random();
 		int odds = rand.nextInt(1000) + 1;
-		if (e.getEntityType().equals(EntityType.PLAYER)) {
+
 			Player p = e.getEntity();
 			LivingEntity k = p.getKiller();
 			if (k.getType().equals(EntityType.PLAYER)) {
@@ -74,7 +74,15 @@ public final class EventsHandler implements Listener {
 					}
 				}
 			}
-		}
+			if (p.hasMetadata("Killer") && Main.getMetadata(p, "Killer") != null) {
+				int timeOfLastHit = (int) Main.getMetadata(p, "Age");
+				int timeOfDeath = p.getTicksLived();
+				int timeSinceLastHit = timeOfDeath - timeOfLastHit;
+				if (timeSinceLastHit <= 30*20) {
+					Utilities.setKiller((Player) Main.getMetadata(p, "Killer"), p);
+				}
+			}
+		
 	}
 
 	@EventHandler
@@ -117,17 +125,6 @@ public final class EventsHandler implements Listener {
 			if (Team.objectIsInATeam(ent)) {
 				Team team = Team.getTeamOfColor(Team.getTeamColorOfObject(ent));
 				team.friendlyMobs.remove(ent);
-			}
-		}
-		else {
-			Player p = (Player) e;
-			if (p.hasMetadata("Killer") && Main.getMetadata(p, "Killer") != null) {
-				int timeOfLastHit = (int) Main.getMetadata(p, "Age");
-				int timeOfDeath = p.getTicksLived();
-				int timeSinceLastHit = timeOfDeath - timeOfLastHit;
-				if (timeSinceLastHit <= 30*20) {
-					Utilities.setKiller((Player) Main.getMetadata(p, "Killer"), p);
-				}
 			}
 		}
 	}

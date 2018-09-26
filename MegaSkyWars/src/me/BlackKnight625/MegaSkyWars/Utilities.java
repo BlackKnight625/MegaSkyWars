@@ -424,7 +424,7 @@ public class Utilities {
 		double closest = radius;
 		LivingEntity closestp = null;
 		for(LivingEntity i : l.getWorld().getLivingEntities()){
-			if ((Team.objectIsInATeam(i) && !Team.getTeamColorOfObject(i).equals(color)) || !Team.objectIsInATeam(i) && !i.getType().equals(EntityType.PLAYER)) {
+			if (((Team.objectIsInATeam(i) && !Team.getTeamColorOfObject(i).equals(color)) || !Team.objectIsInATeam(i)) && !i.getType().equals(EntityType.PLAYER)) {
 				double dist = i.getLocation().distance(l);
 				if (closest == Double.MAX_VALUE || dist < closest) {
 						closest = dist;

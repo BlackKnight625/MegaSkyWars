@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -630,6 +631,7 @@ public class Structure {
 						break;
 					}
 					builder.getWorld().playSound(b.getLocation(), sound, 0.5f, 1f);
+					builder.getWorld().spawnParticle(Particle.SPELL_INSTANT, b.getLocation(), 1);
 				}			
 			}
 		}.runTaskTimer(Main.plugin, 1, (long) buildTime/scheduledBlocks.size()*20);
