@@ -148,7 +148,7 @@ public class Structure {
 			specialBlockKey = "Spawner";
 			specialBlockKey2 = "Monster";
 			specialBlockValue = 10;
-			specialBlockValue = 1;
+			specialBlockValue2 = 1;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_2:
@@ -165,7 +165,7 @@ public class Structure {
 			specialBlockKey = "Spawner";
 			specialBlockKey2 = "Monster";
 			specialBlockValue = 11;
-			specialBlockValue = 2;
+			specialBlockValue2 = 2;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_3:
@@ -182,7 +182,7 @@ public class Structure {
 			specialBlockKey = "Spawner";
 			specialBlockKey2 = "Monster";
 			specialBlockValue = 12;
-			specialBlockValue = 3;
+			specialBlockValue2 = 3;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_4:
@@ -199,7 +199,7 @@ public class Structure {
 			specialBlockKey = "Spawner";
 			specialBlockKey2 = "Monster";
 			specialBlockValue = 13;
-			specialBlockValue = 4;
+			specialBlockValue2 = 4;
 			specialBlock = Material.SPAWNER;
 			break;
 		case NECROMANCER_PIT_5:
@@ -216,7 +216,7 @@ public class Structure {
 			specialBlockKey = "Spawner";
 			specialBlockKey2 = "Monster";
 			specialBlockValue = 100;
-			specialBlockValue = 5;
+			specialBlockValue2 = 5;
 			specialBlock = Material.SPAWNER;
 			break;
 		case POWER_STATION_1:

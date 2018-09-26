@@ -83,12 +83,15 @@ public final class EventsHandler implements Listener {
 		Entity damager = e.getDamager();
 		if (damager instanceof Player) {
 			Player p = (Player) damager;
-			if (Team.playerIsInATeam(p)) {
-				if (Team.objectIsInATeam(damager)) {
-					if (Team.objectIsInSameTeamAs(p, damaged)) {
-						e.setCancelled(true);
-					}
+			if (Team.objectIsInATeam(damager)) {
+				if (Team.objectIsInSameTeamAs(p, damaged)) {
+					e.setCancelled(true);
 				}
+			}	
+		}
+		else if (damager instanceof Entity) {
+			if (Team.objectIsInSameTeamAs(damaged, damager)) {
+				e.setCancelled(true);
 			}
 		}
 	}
@@ -114,6 +117,17 @@ public final class EventsHandler implements Listener {
 			if (Team.objectIsInATeam(ent)) {
 				Team team = Team.getTeamOfColor(Team.getTeamColorOfObject(ent));
 				team.friendlyMobs.remove(ent);
+			}
+		}
+		else {
+			Player p = (Player) e;
+			if (p.hasMetadata("Killer") && Main.getMetadata(p, "Killer") != null) {
+				int timeOfLastHit = (int) Main.getMetadata(p, "Age");
+				int timeOfDeath = p.getTicksLived();
+				int timeSinceLastHit = timeOfDeath - timeOfLastHit;
+				if (timeSinceLastHit <= 30*20) {
+					Utilities.setKiller((Player) Main.getMetadata(p, "Killer"), p);
+				}
 			}
 		}
 	}

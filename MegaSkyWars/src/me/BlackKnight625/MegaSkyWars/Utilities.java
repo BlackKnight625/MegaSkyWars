@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.BlackKnight625.DuringGame.Team;
 import me.BlackKnight625.DuringGame.TeamColor;
@@ -315,6 +317,26 @@ public class Utilities {
 		m.setCustomName(team.getChatColor() + "" + name1 + name2 + ": " + name3 + name4);
 		team.friendlyMobs.add(m);
 	}
+	public static synchronized void refreshTargetOfFriendlyMob(Monster mob, Team team) {
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				Player player = getClosestEnemyPlayer(mob.getLocation(), team, 20);
+				LivingEntity entity = getClosestEnemyLivingEntity(mob.getLocation(), team, 20);
+				
+				if (entity != null) {
+					mob.setTarget(entity);
+				}
+				else if (player != null && (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE))) {
+					mob.setTarget(player);
+				}
+				else {
+					mob.setTarget(null);
+				}			
+			}
+		}.runTaskLater(Main.plugin, 10/Main.friendlyMonsterCount);	
+	}
 	
 	public static Player getClosestPlayer(Location l, double radius) {
 		double closest = radius;
@@ -363,7 +385,7 @@ public class Utilities {
 			if (Team.playerIsInATeam(i)) {
 				double dist = i.getLocation().distance(l);
 				if (closest == Double.MAX_VALUE || dist < closest) {
-					if (Team.getTeamOfPlayer(i).getTeamColor().equals(color)) {
+					if (Team.getTeamOfPlayer(i).getTeamColor().equals(color) && dist != 0) {
 						closest = dist;
 						closestp = i;
 					}
@@ -603,5 +625,22 @@ public class Utilities {
 		return e;
 	}
 
-
+	public static void damageEnemy(Player damager, Player damaged, int damage, boolean trueDamage) {
+		if (!Team.playerIsInSameTeamAs(damaged, damager)) {
+			if (trueDamage) {
+				double health = damaged.getHealth();
+				health = health - damage;
+				damaged.setHealth(health);
+			}
+			else {
+				damaged.damage(damage);
+			}
+			setKiller(damager, damaged);
+		}
+	}
+	public static void setKiller(Player killer, Player killed) {
+			Main.setMetadata(killed, "Killer", killer);
+			Main.setMetadata(killed, "Age", killed.getTicksLived());
+			killed.damage(0.001, killer);
+	}
 }

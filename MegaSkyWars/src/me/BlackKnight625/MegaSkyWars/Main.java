@@ -1,15 +1,14 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -31,16 +30,12 @@ public class Main extends JavaPlugin implements Listener {
 	public Team team;
 	public static Scoreboard scoreboard;
 
-	
+	public static int friendlyMonsterCount = 0;
 	
 	public void onEnable() {
 		plugin = this;
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
-		new EventsHandler(this);
-		
-		
-		
-		
+		new EventsHandler(this);	
 		
 		scoreboard = getServer().getScoreboardManager().getMainScoreboard();
 		new BukkitRunnable() {
@@ -58,28 +53,20 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				for (Team team : Team.getTeams()) {
-					if (!team.friendlyMobs.isEmpty()) {
-						for (Monster mob : team.friendlyMobs) {
-							
-								Player player = Utilities.getClosestEnemyPlayer(mob.getLocation(), team, 20);
-								LivingEntity entity = Utilities.getClosestEnemyLivingEntity(mob.getLocation(), team, 20);
-								
-								if (entity != null) {
-									mob.setTarget(entity);
-								}
-								else if (player != null && (player.getGameMode().equals(GameMode.SURVIVAL) || player.getGameMode().equals(GameMode.ADVENTURE))) {
-									mob.setTarget(player);
-								}
-								else {
-									mob.setTarget(null);
-								}
-							
-						}
-					}
+					friendlyMonsterCount += team.friendlyMobs.size();
 				}
-				
+				Iterator<Team> itt = Team.getTeams().iterator();
+				if (!itt.hasNext()) {
+					this.cancel();
+				}
+				Team team = itt.next();
+				Iterator<Monster> itm = team.friendlyMobs.iterator();
+				while (itm.hasNext()) {
+					Monster mob = itm.next();
+					Utilities.refreshTargetOfFriendlyMob(mob, team);
+				}		
 			}
-		}.runTaskTimer(this, 10, 10);
+		}.runTaskTimer(this, 10, 20);
 	}
 	public void onDisable() {
 		for (Player p : Bukkit.getOnlinePlayers()) {
