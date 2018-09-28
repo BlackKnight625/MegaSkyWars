@@ -35,7 +35,7 @@ public class Main extends JavaPlugin implements Listener {
 	public void onEnable() {
 		plugin = this;
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
-		new EventsHandler(this);	
+		new EventsHandler(this);
 		
 		scoreboard = getServer().getScoreboardManager().getMainScoreboard();
 		new BukkitRunnable() {
@@ -55,14 +55,14 @@ public class Main extends JavaPlugin implements Listener {
 				for (Team team : Team.getTeams()) {
 					friendlyMonsterCount += team.friendlyMobs.size();
 				}
-				Iterator<Team> itt = Team.getTeams().iterator();	
+				Iterator<Team> itt = Team.getTeams().iterator();
 				while (itt.hasNext()) {
 					Team team = itt.next();
 					Iterator<Monster> itm = team.friendlyMobs.iterator();
 					while (itm.hasNext()) {
 						Monster mob = itm.next();
 						Utilities.refreshTargetOfFriendlyMob(mob, team);
-					} 
+					}
 				}
 			}
 		}.runTaskTimer(this, 10, 20);

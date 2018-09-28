@@ -2,12 +2,15 @@ package me.BlackKnight625.MegaSkyWars;
 
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,9 +18,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.BlackKnight625.DuringGame.Team;
 
+@SuppressWarnings("unused")
 public final class EventsHandler implements Listener {
 	public EventsHandler(Main plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -26,11 +32,7 @@ public final class EventsHandler implements Listener {
 	@EventHandler
 	public void blockBreakEvent(BlockBreakEvent e) {
 		Player p = e.getPlayer();
-		@SuppressWarnings("unused")
-		Team team = Team.getTeamOfPlayer(p);
-		Block b = e.getBlock();
-		
-		
+		Block b = e.getBlock();		
 		
 		if (Team.playerIsInATeam(p)) {
 			if (b.hasMetadata("Team")) {
@@ -129,5 +131,22 @@ public final class EventsHandler implements Listener {
 		}
 	}
 
-
+	@EventHandler
+	public void projectileHitEvent(ProjectileHitEvent e) {
+		if (e.getHitEntity() != null) {
+			if (e.getEntity().getShooter() instanceof LivingEntity) {
+				LivingEntity shooter = (LivingEntity) e.getEntity().getShooter();
+				Entity shot = e.getHitEntity();
+				if (Team.objectIsInSameTeamAs(shooter, shot)) {
+					shot.setInvulnerable(true);
+					new BukkitRunnable() {	
+						@Override
+						public void run() {
+							shot.setInvulnerable(false);
+						}
+					}.runTaskLater(Main.plugin, 4);
+				}
+			} 
+		}
+	}
 }
