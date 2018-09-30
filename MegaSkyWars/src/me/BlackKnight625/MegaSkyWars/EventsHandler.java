@@ -123,8 +123,9 @@ public final class EventsHandler implements Listener {
 	@EventHandler
 	public void entityDeathEvent(EntityDeathEvent e) {
 		if (!e.getEntity().getType().equals(EntityType.PLAYER)) {
-			Monster ent = (Monster) e.getEntity();
-			if (Team.objectIsInATeam(ent)) {
+			Entity entity = e.getEntity();
+			if (Team.objectIsInATeam(entity)) {
+				Monster ent = (Monster) e.getEntity();
 				Team team = Team.getTeamOfColor(Team.getTeamColorOfObject(ent));
 				team.friendlyMobs.remove(ent);
 			}

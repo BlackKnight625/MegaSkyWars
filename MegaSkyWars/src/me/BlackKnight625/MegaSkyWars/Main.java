@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -82,7 +85,7 @@ public class Main extends JavaPlugin implements Listener {
 		
 	}
 	
-	@SuppressWarnings({ "unused", "deprecation" })
+	@SuppressWarnings({"deprecation" })
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		
 		if (sender.isOp()) {
@@ -93,10 +96,8 @@ public class Main extends JavaPlugin implements Listener {
 			if (c.equalsIgnoreCase("oi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					if (Team.playerIsInATeam(p)) {
-						Utilities.createFriendlyTeamMob(Team.getTeamOfPlayer(p), Utilities.getEntityTypeDependingOnNecromancerLevel(9), p.getLocation());
-						return true;
-					}
+					new OreGenerator(OreType.COPPER, Material.STONE, 10, p.getLocation(), 100);
+					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
 			}
@@ -148,9 +149,9 @@ public class Main extends JavaPlugin implements Listener {
 				if (isPlayer) {
 					if (hasArgs) {
 						Stream<StructureType> values = Arrays.stream(StructureType.values());
-						if (values.anyMatch(v -> v.toString().equalsIgnoreCase(args[0]))) {
+						if (values.anyMatch(v -> v.toString().equalsIgnoreCase(args[0].toUpperCase()))) {
 							try {
-								Structure tower = new Structure(StructureType.valueOf(args[0]), (Player) sender);
+								new Structure(StructureType.valueOf(args[0].toUpperCase()), (Player) sender);
 								return true;
 							} catch (ArithmeticException e) {
 								sender.sendMessage("You are not in a team");
@@ -160,13 +161,62 @@ public class Main extends JavaPlugin implements Listener {
 							}
 						}
 						sender.sendMessage("The name of the Structure must be written in caps! If that was the case,"
-								+ " then it does not exist! You must type one of the following: " + StructureType.intoString());
+								+ " then it does not exist! You must type one of the following: " + StructureType.intoString().toLowerCase());
 						return false;
 					}
 					else {
-						sender.sendMessage("Not enough parameters! You must type one of the following: " + StructureType.intoString());
+						sender.sendMessage("Not enough parameters! You must type one of the following: " + StructureType.intoString().toLowerCase());
 						return false;
 					}
+				}
+				sender.sendMessage("You must be a player to perform this command");
+				return false;
+			}
+			else if (c.equalsIgnoreCase("friendlymob")) {
+				if (isPlayer) {
+					Player p = (Player) sender;
+					if (hasArgs) {
+						if (Team.playerIsInATeam(p)) {
+							try {
+								EntityType m = EntityType.valueOf(args[0].toUpperCase());
+								Utilities.createFriendlyTeamMob(Team.getTeamOfPlayer(p), m, p.getLocation());
+								return true;
+							}
+							catch (CommandException e) {
+								p.sendMessage("Invalid entity type or entity type is not an instance of Monster!");
+								return false;
+							}
+						}
+						p.sendMessage("You must be in a team to perform this command!");
+						return false;
+					}
+					p.sendMessage("You must specify the type of mob you want to spawn!");
+					return false;
+				}
+				sender.sendMessage("You must be a player to perform this command");
+				return false;
+			}
+			else if (c.equalsIgnoreCase("spawnores")) {
+				if (isPlayer) {
+					Player p = (Player) sender;
+					if (hasArgs) {
+						if (ammount >= 4) {
+							Stream<OreType> values = Arrays.stream(OreType.values());
+							if (values.anyMatch(v -> v.toString().equalsIgnoreCase(args[0].toUpperCase()))) {
+								OreType ore = OreType.valueOf(args[0].toUpperCase());
+								Material m = Material.valueOf(args[1].toUpperCase());
+								int radius = Integer.valueOf(args[2]);
+								int blocks = Integer.valueOf(args[3]);
+								new OreGenerator(ore, m, radius, p.getLocation(), blocks);
+								
+								return true;
+							}
+						}
+					}
+					p.sendMessage("You must specify the type of Ore you want to spawn, the material that will get replaced, "
+							+ "the radius and the ammount! You must choose one of the following Ore Types: " + 
+					OreType.intoString().toLowerCase());
+					return false;
 				}
 				sender.sendMessage("You must be a player to perform this command");
 				return false;

@@ -17,6 +17,16 @@ commands:
       permission-message: You don't have <permission>
    structure:
       description: Create a structure
-      usage: /structure STRUCTURETYPE
+      usage: /structure STRUCTURE_TYPE
       permission: <MegaSkyWars>.structure
+      permission-message: You don't have <permission>
+   friendlymob:
+      description: Creates a friendly mob
+      usage: /friendlymob ENTITY_TYPE
+      permission: <MegaSkyWars>.friendlymob
+      permission-message: You don't have <permission>
+   spawnores:
+      description: Creates ores around the player
+      usage: /spawnores OreType ReplacedBlockType radius ammount
+      permission: <MegaSkyWars>.friendlymob
       permission-message: You don't have <permission>

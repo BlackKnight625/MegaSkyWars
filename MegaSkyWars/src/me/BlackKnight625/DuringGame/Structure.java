@@ -467,6 +467,19 @@ public class Structure {
 			downwards = 2;
 			diagonalStructure = true;
 			break;
+		case DO_NOT_USE_TESTS_ONLY:
+			x1 = -140;
+			y1 = 51;
+			z1 = -41;
+			
+			x2 = -58;
+			y2 = 87;
+			z2 = 26;
+			
+			
+			farAway = 5;
+			downwards = 0;
+			break;
 		}
 		Block block1 = Bukkit.getWorld("Mega").getBlockAt(new Location(builder.getWorld(), x1, y1, z1));
 		Block block2 = Bukkit.getWorld("Mega").getBlockAt(new Location(builder.getWorld(), x2, y2, z2));

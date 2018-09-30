@@ -7,6 +7,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
@@ -127,6 +128,23 @@ public class Utilities {
         return blocks;
  
     }
+	public static ArrayList<Block> getBlocksInRadius(int radius, Location location) {
+		Location point1 = location.getBlock().getLocation().add(radius, radius, radius);
+		Location point2 = location.getBlock().getLocation().add(-radius, -radius, -radius);
+		ArrayList<Block> list = getStructure(point1.getBlock(), point2.getBlock());
+		return list;
+	}
+	public static ArrayList<Block> getAdjacentBlocksOfMaterial(Material material, Block block) {
+		ArrayList<Block> adjacent = new ArrayList<Block>();
+		Location point1 = block.getLocation().add(1, 1, 1);
+		Location point2 = block.getLocation().add(-1, -1, -1);
+		for (Block b : getStructure(point1.getBlock(), point2.getBlock())) {
+			if (b.getType().equals(material)) {
+				adjacent.add(b);
+			}
+		}
+		return adjacent;
+	}
 	public static void rotateBlock(Block b, String dir) {			
 			if (b.getBlockData() instanceof Directional) {
 				BlockFace face = BlockFace.NORTH;
@@ -306,16 +324,21 @@ public class Utilities {
 	}
 
 	public static void createFriendlyTeamMob(Team team, EntityType type, Location loc) {
-		Entity e = loc.getWorld().spawnEntity(loc, type);		
-		Monster m = (Monster) e;
-		Main.setMetadata(m, "Team", team.getTeamColor());
-		m.setCanPickupItems(true);
-		char name1 = team.getColor().charAt(0);
-		String name2 = team.getColor().substring(1).toLowerCase();
-		char name3 = m.getType().toString().charAt(0);
-		String name4 = m.getType().toString().substring(1).toLowerCase();
-		m.setCustomName(team.getChatColor() + "" + name1 + name2 + ": " + name3 + name4);
-		team.friendlyMobs.add(m);
+		try {
+			Entity e = loc.getWorld().spawnEntity(loc, type);
+			Monster m = (Monster) e;
+			Main.setMetadata(m, "Team", team.getTeamColor());
+			m.setCanPickupItems(true);
+			char name1 = team.getColor().charAt(0);
+			String name2 = team.getColor().substring(1).toLowerCase();
+			char name3 = m.getType().toString().charAt(0);
+			String name4 = m.getType().toString().substring(1).toLowerCase();
+			m.setCustomName(team.getChatColor() + "" + name1 + name2 + ": " + name3 + name4);
+			team.friendlyMobs.add(m);
+		} catch (ClassCastException e) {
+			Bukkit.broadcastMessage("The mob that was trying to spawn is not an instance of Monster! As such, it will"
+					+ " not be placed in a team");
+		}
 	}
 	public static synchronized void refreshTargetOfFriendlyMob(Monster mob, Team team) {
 		new BukkitRunnable() {
@@ -643,4 +666,5 @@ public class Utilities {
 			Main.setMetadata(killed, "Age", killed.getTicksLived());
 			killed.damage(0.001, killer);
 	}
+
 }

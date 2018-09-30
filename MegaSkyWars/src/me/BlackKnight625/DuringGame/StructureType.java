@@ -29,7 +29,8 @@ public enum StructureType {
 	NECROMANCER_PIT_2 (true, 13),
 	NECROMANCER_PIT_3 (true, 16),
 	NECROMANCER_PIT_4 (true, 19),
-	NECROMANCER_PIT_5 (true, 22);
+	NECROMANCER_PIT_5 (true, 22),
+	DO_NOT_USE_TESTS_ONLY (false, 10);
 	
 	private boolean teamBuild;
 	private double buildTime;
