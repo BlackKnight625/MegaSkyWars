@@ -480,6 +480,22 @@ public class Structure {
 			farAway = 5;
 			downwards = 0;
 			break;
+		case SPECIAL_FURNACE:
+			x1 = 211;
+			y1 = 4;
+			z1 = 6;
+			
+			x2 = 215;
+			y2 = 7;
+			z2 = 10;
+			
+			
+			farAway = 1;
+			downwards = 0;
+			specialBlockKey = "Special Furnace";
+			specialBlockValue = 3;
+			specialBlock = Material.FURNACE;
+			break;
 		}
 		Block block1 = Bukkit.getWorld("Mega").getBlockAt(new Location(builder.getWorld(), x1, y1, z1));
 		Block block2 = Bukkit.getWorld("Mega").getBlockAt(new Location(builder.getWorld(), x2, y2, z2));
@@ -661,6 +677,10 @@ public class Structure {
 			else if (b.getType().equals(Material.REDSTONE_BLOCK)) {
 				Main.setMetadata(b, specialBlockKey, specialBlockValue);
 				team.powerBlocks.add(b);
+			}
+			else if (b.getType().equals(Material.FURNACE)) {
+				Main.setMetadata(b, specialBlockKey, specialBlockValue);
+				Main.setMetadata(b, "Owner", builder);
 			}
 		}
 	}

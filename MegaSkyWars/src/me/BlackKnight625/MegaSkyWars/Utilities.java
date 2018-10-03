@@ -145,6 +145,15 @@ public class Utilities {
 		}
 		return adjacent;
 	}
+	public static ArrayList<Block> getAdjacentBlocks(Block block) {
+		ArrayList<Block> adjacent = new ArrayList<Block>();
+		Location point1 = block.getLocation().add(1, 1, 1);
+		Location point2 = block.getLocation().add(-1, -1, -1);
+		for (Block b : getStructure(point1.getBlock(), point2.getBlock())) {
+				adjacent.add(b);		
+		}
+		return adjacent;
+	}
 	public static void rotateBlock(Block b, String dir) {			
 			if (b.getBlockData() instanceof Directional) {
 				BlockFace face = BlockFace.NORTH;
@@ -656,7 +665,7 @@ public class Utilities {
 				damaged.setHealth(health);
 			}
 			else {
-				damaged.damage(damage);
+				damaged.damage(damage, damager);
 			}
 			setKiller(damager, damaged);
 		}
@@ -666,5 +675,6 @@ public class Utilities {
 			Main.setMetadata(killed, "Age", killed.getTicksLived());
 			killed.damage(0.001, killer);
 	}
+	
 
 }

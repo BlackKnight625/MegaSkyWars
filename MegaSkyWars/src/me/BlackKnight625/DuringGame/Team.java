@@ -1,19 +1,29 @@
 package me.BlackKnight625.DuringGame;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Chest;
+import org.bukkit.block.Hopper;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.Metadatable;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import me.BlackKnight625.MegaSkyWars.Main;
+import me.BlackKnight625.MegaSkyWars.Utilities;
 
 public class Team {
 	
@@ -26,10 +36,13 @@ public class Team {
 	private ArrayList<Player> playersInATeam = new ArrayList<Player>();
 	@SuppressWarnings("unused")
 	private Location witherLocation;
+	private Location communityChest = null;
 	
 	public ArrayList<Block> monsterSpawners = new ArrayList<Block>();
 	public ArrayList<Block> powerBlocks = new ArrayList<Block>();
 	public ArrayList<Monster> friendlyMobs = new ArrayList<Monster>();
+	
+	public ArrayList<Location> communityChests = new ArrayList<Location>();
 	
 	public static ArrayList<Team> teams = new ArrayList<Team>();
 	
@@ -142,7 +155,6 @@ public class Team {
 		return null;
 	}
 
-	
 	public static void setTeamColorToObject(Metadatable o, TeamColor color) {
 		Main.setMetadata(o, "Team", color);
 	}
@@ -286,5 +298,82 @@ public class Team {
 			}
 		}
 		return null;
+	}
+
+	public void setCommunityChest(Location l) {
+		boolean lContainer = l.getBlock().getState() instanceof Chest || 
+				l.getBlock().getState() instanceof ShulkerBox || l.getBlock().getState() instanceof Hopper;
+		if (lContainer) {
+			Main.setMetadata(l.getBlock(), "Community Chest", color);
+			communityChests.add(l);
+			this.communityChest = l;
+			for (Block b : Utilities.getAdjacentBlocks(l.getBlock())) {
+				BlockState s = b.getState();
+				boolean container = s instanceof Chest || s instanceof ShulkerBox || s instanceof Hopper;
+				if (container) {
+					Main.setMetadata(b, "Community Chest", color);
+					communityChests.add(b.getLocation());
+					new BukkitRunnable() {
+						
+						@Override
+						public void run() {
+							b.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, b.getLocation(), 5, 0.5, 0.5, 0.5);
+						}
+					}.runTaskTimer(Main.plugin, 0, 20);
+				}
+			} 
+		}
+	}
+	public Location getCommunityChest() {
+		return communityChest;
+	}
+	public ArrayList<Location> getCommunityChests() {
+		return communityChests;
+	}
+	public void putItemsInsideCommunityChest(ArrayList<ItemStack> items) {
+		try {	
+			for (ItemStack i : items) {
+				Iterator<Location> it = communityChests.iterator();	
+				while (it.hasNext()) {
+					Chest chest = (Chest) it.next().getBlock().getState();
+					if (chest.getInventory().firstEmpty() != -1) {
+						chest.getInventory().addItem(i);
+						break;
+					} else if (it.hasNext()) {
+						continue;
+					} else {
+						ArrayList<Block> dropLs = Utilities.getAdjacentBlocks(chest.getBlock());
+						Collections.shuffle(dropLs);
+						Location dropL = dropLs.get(0).getLocation();
+						dropL.getWorld().dropItem(dropL, i);
+					} 
+				}			
+			}
+		}
+		catch (NullPointerException e) {
+			
+		}
+	}
+	public void putItemInsideCommunityChest(ItemStack item) {
+		try {
+			Iterator<Location> it = communityChests.iterator();
+			while (it.hasNext()) {
+				Chest chest = (Chest) it.next().getBlock().getState();
+				if (chest.getInventory().firstEmpty() != -1) {
+					chest.getInventory().addItem(item);
+					return;
+				} else if (it.hasNext()) {
+					continue;
+				} else {
+					ArrayList<Block> dropLs = Utilities.getAdjacentBlocks(chest.getBlock());
+					Collections.shuffle(dropLs);
+					Block dropL = dropLs.get(0);
+					dropL.getWorld().dropItem(dropL.getLocation(), item);
+				} 
+			}		
+		}
+		catch (NullPointerException e) {
+			
+		}
 	}
 }

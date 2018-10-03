@@ -30,7 +30,8 @@ public enum StructureType {
 	NECROMANCER_PIT_3 (true, 16),
 	NECROMANCER_PIT_4 (true, 19),
 	NECROMANCER_PIT_5 (true, 22),
-	DO_NOT_USE_TESTS_ONLY (false, 10);
+	DO_NOT_USE_TESTS_ONLY (false, 10),
+	SPECIAL_FURNACE (false, 2);
 	
 	private boolean teamBuild;
 	private double buildTime;

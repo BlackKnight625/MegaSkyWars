@@ -10,6 +10,11 @@ commands:
       usage: /oi
       permission: <MegaSkyWars>.oi
       permission-message: You don't have <permission>
+   oioi:
+      description: 2nd Debugging tool
+      usage: /oioi
+      permission: <MegaSkyWars>.oioi
+      permission-message: You don't have <permission>
    team:
       description: Join a team
       usage: /team (player) join TEAMCOLOR

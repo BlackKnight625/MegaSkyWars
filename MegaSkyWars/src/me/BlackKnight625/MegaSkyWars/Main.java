@@ -96,7 +96,18 @@ public class Main extends JavaPlugin implements Listener {
 			if (c.equalsIgnoreCase("oi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					new OreGenerator(OreType.COPPER, Material.STONE, 10, p.getLocation(), 100);
+					if (Team.playerIsInATeam(p)) {
+						Team team = Team.getTeamOfPlayer(p);
+						team.setCommunityChest(p.getLocation().getBlock().getLocation().add(0, 0, 0));
+					}
+					return true;
+				}
+				else {sender.sendMessage("Sender must be a player!"); return false;}
+			}
+			else if (c.equalsIgnoreCase("oioi")) {
+				if (isPlayer) {
+					Player p = (Player) sender;
+					Utilities.setKiller(p, p);
 					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
