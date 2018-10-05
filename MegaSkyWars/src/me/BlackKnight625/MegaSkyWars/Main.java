@@ -15,6 +15,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
@@ -69,6 +70,26 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 		}.runTaskTimer(this, 10, 20);
+		
+		/* for (ArmorTier tier : ArmorTier.values()) {
+			for (int x = 1; x <= 4; x++) {
+				ShapedRecipe recipe = new ShapedRecipe(null);
+				switch (x) {
+				case 1:
+					ItemStack item = new ItemStack(stack)
+					item.getItemMeta().
+					
+					recipe.shape("xxy", "xyy", "xxy");
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				}
+			}
+		}*/
 	}
 	public void onDisable() {
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -96,18 +117,18 @@ public class Main extends JavaPlugin implements Listener {
 			if (c.equalsIgnoreCase("oi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					if (Team.playerIsInATeam(p)) {
-						Team team = Team.getTeamOfPlayer(p);
-						team.setCommunityChest(p.getLocation().getBlock().getLocation().add(0, 0, 0));
-					}
-					return true;
+					ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
+					p.sendMessage("" + NBTEditor.getItemTag(sword, "generic.attackDamage"));
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
 			}
 			else if (c.equalsIgnoreCase("oioi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					Utilities.setKiller(p, p);
+					if (Team.playerIsInATeam(p)) {
+						Team team = Team.getTeamOfPlayer(p);
+						team.setCommunityChest(p.getLocation().getBlock().getLocation().add(0, 0, 0));
+					}
 					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
