@@ -1,4 +1,4 @@
-package me.BlackKnight625.MegaSkyWars;
+package CustomItems;
 
 public enum ArmorTier {
 	LEATHER_HELMET(56, 1, 0, null),

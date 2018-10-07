@@ -23,6 +23,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import CustomItems.ArmorTier;
+import CustomItems.ResourceType;
 import me.BlackKnight625.DuringGame.Team;
 import me.BlackKnight625.DuringGame.TeamColor;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
@@ -158,6 +160,15 @@ public class Utilities {
 		ArrayList<Block> adjacent = new ArrayList<Block>();
 		Location point1 = block.getLocation().add(1, 1, 1);
 		Location point2 = block.getLocation().add(-1, -1, -1);
+		for (Block b : getStructure(point1.getBlock(), point2.getBlock())) {
+				adjacent.add(b);		
+		}
+		return adjacent;
+	}
+	public static ArrayList<Block> getBlocksInRadius(Block block, int radius) {
+		ArrayList<Block> adjacent = new ArrayList<Block>();
+		Location point1 = block.getLocation().add(radius, radius, radius);
+		Location point2 = block.getLocation().add(-radius, -radius, -radius);
 		for (Block b : getStructure(point1.getBlock(), point2.getBlock())) {
 				adjacent.add(b);		
 		}
@@ -503,6 +514,29 @@ public class Utilities {
 		  return closestp;
 		}
 	}
+	public static ArrayList<Entity> getClosestEntitiesInRange(Location l, double range) {
+		ArrayList<Entity> ent = new ArrayList<>();
+		for(Entity i : l.getWorld().getEntities()){
+			double dist = i.getLocation().distance(l);
+			if (dist < range) {
+				ent.add(i);
+			} 
+		}
+		return ent;
+	}
+	public static ArrayList<Entity> getClosestEntitiesInRangeOfType(Location l, double range, EntityType type) {
+		ArrayList<Entity> ent = new ArrayList<>();
+		for(Entity i : l.getWorld().getEntities()){
+			if (i.getType().equals(type)) {
+				double dist = i.getLocation().distance(l);
+				if (dist < range) {
+					ent.add(i);
+				} 
+			} 
+		}
+		return ent;
+	}
+	
 	
 	//Depends on the Player's necromancer level
 	public static EntityType getEntityTypeDependingOnNecromancerLevel(int level) {
@@ -774,6 +808,23 @@ public class Utilities {
 		meta.setLore(list);
 		item.setItemMeta(meta);
 		item = Utilities.itemWithAddedAttribute(item, map, slot);
+		return item;
+	}
+	public static ItemStack customResource(ResourceType type, int amount) {
+		ArrayList<String> lore = new ArrayList<>();
+		String name = type.getName();
+		Material material = type.getMaterial();
+		ItemStack item = new ItemStack(material, amount);
+		ItemMeta meta = item.getItemMeta();
+		
+		if (type.hasLore()) {
+			lore.add(type.getLore());
+			meta.setLore(lore);
+		}
+		
+		meta.setDisplayName(name);
+		item.setItemMeta(meta);
+		
 		return item;
 	}
 }

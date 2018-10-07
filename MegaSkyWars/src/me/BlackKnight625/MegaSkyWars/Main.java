@@ -16,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
@@ -26,6 +27,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 
+import CustomItems.ArmorTier;
+import CustomItems.ResourceType;
 import me.BlackKnight625.DuringGame.Structure;
 import me.BlackKnight625.DuringGame.StructureType;
 import me.BlackKnight625.DuringGame.Team;
@@ -36,6 +39,7 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public Team team;
 	public static Scoreboard scoreboard;
+	int recipeID = 0;
 
 	public static int friendlyMonsterCount = 0;
 	
@@ -85,24 +89,54 @@ public class Main extends JavaPlugin implements Listener {
 					Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
 				    
 			        while(it.hasNext()){
-
+			        		Recipe rec = it.next();
 			            	Material maybe = result.getType();
-							ItemStack results = it.next().getResult();
+							ItemStack results = rec.getResult();
 							if(results.getType().equals(maybe)){
 							    it.remove();
 							}
 			        }
 				}
+				Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
+				while (it.hasNext()) {
+					Recipe rec = it.next();
+					if (rec instanceof FurnaceRecipe) {	
+						if (!rec.getResult().isSimilar(new ItemStack(Material.CHARCOAL)) && !rec.getResult().isSimilar(new ItemStack(Material.IRON_NUGGET))) {
+							it.remove();
+							((FurnaceRecipe) rec).setCookingTime(66);
+							new BukkitRunnable() {
+
+								@Override
+								public void run() {
+									getServer().addRecipe(rec);
+
+								}
+							}.runTaskLater(plugin, 5);
+						}
+					}
+				}
+			for (ResourceType type : ResourceType.values()) {
+				recipeID++;
+				int underline = type.toString().indexOf("_");
+				String typeF = type.toString().substring(0, underline);
+				String typeL = type.toString().substring(underline + 1);
+				if (typeL.equalsIgnoreCase("ORE") && ResourceType.contains(typeF + "_INGOT")) {
+					NamespacedKey key = new NamespacedKey(plugin, type.toString().toLowerCase() + recipeID);
+					ItemStack result = Utilities.customResource(ResourceType.valueOf(typeF + "_INGOT"), 1);
+					FurnaceRecipe recipe = new FurnaceRecipe(key, result, type.getMaterial(), 1, 66);
+					getServer().addRecipe(recipe);
+				}
+			}		
 				
-			int i = 0;
+			
 			for (ArmorTier tier : ArmorTier.values()) {
-				i++;
+				recipeID++;
 				int underline = tier.toString().indexOf("_");
 				String tierF = tier.toString().substring(0, underline);
 				String tierL = tier.toString().substring(underline + 1);
 				
-				NamespacedKey key = new NamespacedKey(plugin, tier.toString().toLowerCase() + i);
-				NamespacedKey key2 = new NamespacedKey(plugin, tier.toString().toLowerCase() + (i + 1));
+				NamespacedKey key = new NamespacedKey(plugin, tier.toString().toLowerCase() + recipeID);
+				NamespacedKey key2 = new NamespacedKey(plugin, tier.toString().toLowerCase() + (recipeID + 1));
 				ItemStack result = Utilities.customArmor(tier);
 				Material craftItem = null;
 		        ShapedRecipe recipe = new ShapedRecipe(key, result);

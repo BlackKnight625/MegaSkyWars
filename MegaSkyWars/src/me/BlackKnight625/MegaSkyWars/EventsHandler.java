@@ -5,11 +5,14 @@ import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Hopper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -22,15 +25,18 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import CustomItems.ResourceType;
 import me.BlackKnight625.DuringGame.Team;
 
 @SuppressWarnings("unused")
@@ -60,6 +66,25 @@ public final class EventsHandler implements Listener {
 					e.setDropItems(false);
 				}
 			}
+		}
+		int amount = 1;
+		Material m = b.getType();
+		if (ResourceType.materialIsAResource(m)) {
+			ResourceType type = ResourceType.getResourceFromMaterial(m);
+			ItemStack drop;
+			switch (type) {
+			case ONYX_ORE:
+				drop = Utilities.customResource(ResourceType.ONYX_GEM, amount);
+				break;
+			case PRISMARINE_ORE:
+				drop = new ItemStack(Material.PRISMARINE_SHARD, amount);
+				break;
+			default:
+				drop = Utilities.customResource(type, amount);
+				break;
+			}
+			e.setDropItems(false);
+			b.getWorld().dropItem(b.getLocation().add(0.5, 0.5, 0.5), drop);
 		}
 	}
 	
@@ -147,6 +172,15 @@ public final class EventsHandler implements Listener {
 	}
 	
 	@EventHandler
+	public void entityDamageEvent(EntityDamageEvent e) {
+		if (e.getCause().equals(DamageCause.BLOCK_EXPLOSION)) {
+			double damage = e.getDamage();
+			damage = 0.4 * damage;
+			e.setDamage(damage);
+		}
+	}
+	
+	@EventHandler
 	public void entityTargetEntityEvent(EntityTargetLivingEntityEvent e) {
 		Entity ent = e.getEntity();
 		Entity target = e.getTarget();
@@ -194,7 +228,6 @@ public final class EventsHandler implements Listener {
 	@EventHandler
 	public void furnaceSmelt(FurnaceSmeltEvent e) {
 		Furnace fur = (Furnace) e.getBlock().getState();
-		fur.setCookTime((short) 133);
 		new BukkitRunnable() {
 			
 			@Override
@@ -218,26 +251,116 @@ public final class EventsHandler implements Listener {
 						fur.getWorld().dropItem(fur.getLocation().add(0, 1, 0), droppedItems);
 					}
 				}	
-				fur.getBlock().getState().update();
 			}
 		}.runTaskLater(Main.plugin, 0);	
 	}
 	@EventHandler
 	public void furnaceBurn(FurnaceBurnEvent e) {
-		Furnace fur = (Furnace) e.getBlock().getState();
-		fur.setCookTime((short) 133);
-		fur.update();
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				Furnace fur = (Furnace) e.getBlock().getState();
+				Bukkit.broadcastMessage("Initial burn time: " + fur.getBurnTime());
+				int iBurn = fur.getBurnTime();
+				int fBurn = iBurn/3;
+				fur.setBurnTime((short) fBurn);
+				fur.update();		
+			}
+		}.runTaskLater(Main.plugin, 0);
+	}
+
+	@EventHandler
+	public void playerDropItems(PlayerDropItemEvent e) {
+		Item item = e.getItemDrop();
+		Player p = e.getPlayer();
+		Main.setMetadata(item, "Owner", p);
+		Main.setMetadata(item, "Age", item.getTicksLived());
+		Material m = item.getItemStack().getType();
+		
+		if (ResourceType.materialIsAResource(m)) {
+			ResourceType type = ResourceType.getResourceFromMaterial(m);
+			if (type.equals(ResourceType.COPPER_INGOT) || type.equals(ResourceType.TIN_INGOT)) {
+				
+				new BukkitRunnable() {
+
+					@Override
+					public void run() {
+						for (Block b : Utilities.getBlocksInRadius(item.getLocation().add(0, -1, 0).getBlock(), 3)) {
+							if (b.getType().equals(Material.STONE_SLAB) && b.hasMetadata("Forge")) {
+								ArrayList<Item> ciIngots = new ArrayList<>();
+								int copperIngots = 0;
+								int tinIngots = 0;
+								if (!Utilities.getClosestEntitiesInRangeOfType(b.getLocation(), 3, EntityType.DROPPED_ITEM).isEmpty()) {
+									for (Entity ent : Utilities.getClosestEntitiesInRangeOfType(b.getLocation(), 3, EntityType.DROPPED_ITEM)) {
+										Item i = (Item) ent;
+										if (ResourceType.materialIsAResource(i.getItemStack().getType())) {
+											Material mi = i.getItemStack().getType();
+											ResourceType ti = ResourceType.getResourceFromMaterial(mi);
+											if (ti.equals(ResourceType.COPPER_INGOT)) {
+												copperIngots = copperIngots + i.getItemStack().getAmount();
+												ciIngots.add(i);
+											} else if (ti.equals(ResourceType.TIN_INGOT)) {
+												tinIngots = tinIngots + i.getItemStack().getAmount();
+												ciIngots.add(i);
+											}
+										}
+									}
+									if (copperIngots >= 3 && tinIngots > 0) {
+										while (copperIngots >= 3) {
+											if (tinIngots > 0) {
+												tinIngots--;
+												copperIngots = copperIngots - 3;
+												
+												Item bronze = b.getWorld().dropItem(b.getLocation().add(0.5, 1, 0.5),
+														Utilities.customResource(ResourceType.BRONZE_INGOT, 4));
+												Main.setMetadata(bronze, "Owner", p);
+												Main.setMetadata(bronze, "Age", bronze.getTicksLived());
+											}
+											else {break;}
+										}
+										for (Item ingots : ciIngots) {
+											ingots.remove();
+										}
+										if (copperIngots > 0) {
+											Item copper = b.getWorld().dropItem(b.getLocation().add(0.5, 0.5, 0.5),
+													Utilities.customResource(ResourceType.COPPER_INGOT, copperIngots));
+											Main.setMetadata(copper, "Owner", p);
+											Main.setMetadata(copper, "Age", copper.getTicksLived());
+										}
+										if (tinIngots > 0) {
+											Item tin = b.getWorld().dropItem(b.getLocation().add(0.5, 0.5, 0.5),
+													Utilities.customResource(ResourceType.TIN_INGOT, tinIngots));
+											Main.setMetadata(tin, "Owner", p);
+											Main.setMetadata(tin, "Age", tin.getTicksLived());
+										}
+										b.getWorld().spawnParticle(Particle.LAVA, b.getLocation().add(0, 1, 0), 20, 0.5,
+												0.5, 0.5);
+										b.getWorld().playSound(b.getLocation(), Sound.BLOCK_LAVA_POP, 1, 1);
+									} 
+								}
+							}
+						}
+					}
+				}.runTaskLater(Main.plugin, 4);
+			}
+		}
 	}
 	@EventHandler
-    public void onFurnaceClick(InventoryClickEvent event) {
-        Block blocktype = event.getWhoClicked().getTargetBlock(null, 10);   
- 
-        if (blocktype.getType() == Material.FURNACE) {
-            if ((event.getSlot() == 0 || event.getSlot() == 1) && event.getCursor().getType() != Material.AIR) {
-                Furnace furnace = (Furnace) blocktype.getState();
-                furnace.setCookTime((short) 133);
-                furnace.update();
-            }
-        }
-    }
+	public void entityPickItems(EntityPickupItemEvent e) {
+		Item item = e.getItem();
+		if (e.getEntity() instanceof Player) {
+			Player picker = (Player) e.getEntity();
+			if (item.hasMetadata("Owner") && Main.getMetadata(item, "Owner") != null) {
+				Player dropper = (Player) Main.getMetadata(item, "Owner");
+				if (!picker.getName().equalsIgnoreCase(dropper.getName())) {
+					int iniAge = (int) Main.getMetadata(item, "Age");
+					int curAge = item.getTicksLived();
+					if ((curAge - iniAge) <= 80) {
+						e.setCancelled(true);
+					}
+				}
+			}
+		}
+	}
 }

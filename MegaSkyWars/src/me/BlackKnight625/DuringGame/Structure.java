@@ -120,6 +120,9 @@ public class Structure {
 			y2 = 6;
 			z2 = 20;
 			
+			specialBlockKey = "Forge";
+			specialBlockValue = 1;
+			specialBlock = Material.STONE_SLAB;
 			farAway = 1;
 			downwards = 1;
 			break;
@@ -681,6 +684,21 @@ public class Structure {
 			else if (b.getType().equals(Material.FURNACE)) {
 				Main.setMetadata(b, specialBlockKey, specialBlockValue);
 				Main.setMetadata(b, "Owner", builder);
+			}
+			else if (b.getType().equals(Material.STONE_SLAB)) {
+				Main.setMetadata(b, specialBlockKey, specialBlockValue);
+				new BukkitRunnable() {
+					
+					@Override
+					public void run() {
+						if (b.getType().equals(Material.STONE_SLAB)) {
+							b.getWorld().spawnParticle(Particle.FLAME, b.getLocation(), 5, 0.5, 0.5, 0.5);
+						}
+						else {
+							this.cancel();
+						}		
+					}
+				}.runTaskTimer(Main.plugin, 0, 20);
 			}
 		}
 	}
