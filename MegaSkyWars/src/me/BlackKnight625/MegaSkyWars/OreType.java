@@ -7,7 +7,7 @@ public enum OreType {
 	COAL(Material.COAL_ORE, true, false, 10, 15),
 	COPPER(Material.DEAD_TUBE_CORAL_BLOCK, false, true, 18, 24),
 	TIN(Material.DEAD_BUBBLE_CORAL_BLOCK, false, true, 10, 16),
-	MITHRIL(Material.DEAD_HORN_CORAL_BLOCK, false, true, 5, 10),
+	MITHRIL(Material.DEAD_HORN_CORAL_BLOCK, false, true, 5, 12),
 	ONYX(Material.BLUE_ICE, true, true, 2, 5),
 	PRISMARINE(Material.DEAD_BRAIN_CORAL_BLOCK, true, true, 8, 30),
 	IRON(Material.IRON_ORE, false, false, 20, 32),

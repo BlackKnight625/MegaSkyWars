@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;
@@ -16,6 +17,8 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.metadata.Metadatable;
@@ -71,25 +74,113 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}.runTaskTimer(this, 10, 20);
 		
-		/* for (ArmorTier tier : ArmorTier.values()) {
-			for (int x = 1; x <= 4; x++) {
-				ShapedRecipe recipe = new ShapedRecipe(null);
-				switch (x) {
-				case 1:
-					ItemStack item = new ItemStack(stack)
-					item.getItemMeta().
-					
-					recipe.shape("xxy", "xyy", "xxy");
+		new BukkitRunnable() {
+			
+			
+			
+			@Override
+			public void run() {
+				for (ArmorTier tier : ArmorTier.values()) {
+					ItemStack result = Utilities.customArmor(tier);
+					Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
+				    
+			        while(it.hasNext()){
+
+			            	Material maybe = result.getType();
+							ItemStack results = it.next().getResult();
+							if(results.getType().equals(maybe)){
+							    it.remove();
+							}
+			        }
+				}
+				
+			int i = 0;
+			for (ArmorTier tier : ArmorTier.values()) {
+				i++;
+				int underline = tier.toString().indexOf("_");
+				String tierF = tier.toString().substring(0, underline);
+				String tierL = tier.toString().substring(underline + 1);
+				
+				NamespacedKey key = new NamespacedKey(plugin, tier.toString().toLowerCase() + i);
+				NamespacedKey key2 = new NamespacedKey(plugin, tier.toString().toLowerCase() + (i + 1));
+				ItemStack result = Utilities.customArmor(tier);
+				Material craftItem = null;
+		        ShapedRecipe recipe = new ShapedRecipe(key, result);
+		        
+				switch (tierF) {
+				case "LEATHER":
+					craftItem = Material.LEATHER;
 					break;
-				case 2:
+				case "TIN":
+					craftItem = Material.RABBIT_HIDE;
 					break;
-				case 3:
+				case "GOLDEN":
+					craftItem = Material.GOLD_INGOT;
 					break;
-				case 4:
+				case "CHAINMAIL":
+					craftItem = Material.IRON_NUGGET;
+					break;
+				case "COPPER":
+					craftItem = Material.FERMENTED_SPIDER_EYE;
+					break;
+				case "BRONZE":
+					craftItem = Material.PHANTOM_MEMBRANE;
+					break;
+				case "QUARTZ":
+					craftItem = Material.QUARTZ;
+					break;
+				case "IRON":
+					craftItem = Material.IRON_INGOT;
+					break;
+				case "PRISMARINE":
+					craftItem = Material.PRISMARINE_SHARD;
+					break;
+				case "MITHRIL":
+					craftItem = Material.GHAST_TEAR;
+					break;
+				case "DIAMOND":
+					craftItem = Material.DIAMOND;
+					break;
+				case "ONYX":
+					craftItem = Material.HEART_OF_THE_SEA;
 					break;
 				}
+				
+				
+				switch (tierL) {
+				case "HELMET":					
+					recipe.shape("xxx", "x x", "   ");
+					recipe.setIngredient('x', craftItem);
+					ShapedRecipe recipe2 = new ShapedRecipe(key2, result);
+					recipe2.shape("   ", "xxx", "x x");
+					recipe2.setIngredient('x', craftItem);
+					getServer().addRecipe(recipe2);
+					break;
+				case "CHESTPLATE":
+					recipe.shape("x x", "xxx", "xxx");
+					recipe.setIngredient('x', craftItem);
+					break;
+				case "LEGGINGS":
+					recipe.shape("xxx", "x x", "x x");
+					recipe.setIngredient('x', craftItem);
+					break;
+				case "BOOTS":
+					recipe.shape("x x", "x x", "   ");
+					recipe.setIngredient('x', craftItem);
+					ShapedRecipe recipe3 = new ShapedRecipe(key2, result);
+					recipe3.shape("   ", "x x", "x x");
+					recipe3.setIngredient('x', craftItem);
+					getServer().addRecipe(recipe3);
+					break;
+					}
+
+				getServer().addRecipe(recipe);
 			}
-		}*/
+				
+			}
+		}.runTaskLater(plugin, 5);
+		
+		
 	}
 	public void onDisable() {
 		for (Player p : Bukkit.getOnlinePlayers()) {
@@ -116,9 +207,15 @@ public class Main extends JavaPlugin implements Listener {
 			boolean isPlayer = sender instanceof Player;
 			if (c.equalsIgnoreCase("oi")) {
 				if (isPlayer) {
+					
 					Player p = (Player) sender;
-					ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
-					p.sendMessage("" + NBTEditor.getItemTag(sword, "generic.attackDamage"));
+					for (ArmorTier tier : ArmorTier.values()) {
+						ItemStack item = Utilities.customArmor(tier);
+						p.getInventory().addItem(item);
+					}
+					
+					
+					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}
 			}

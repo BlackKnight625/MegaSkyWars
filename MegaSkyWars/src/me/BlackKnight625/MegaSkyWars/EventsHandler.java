@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Furnace;
+import org.bukkit.block.Hopper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -193,7 +194,7 @@ public final class EventsHandler implements Listener {
 	@EventHandler
 	public void furnaceSmelt(FurnaceSmeltEvent e) {
 		Furnace fur = (Furnace) e.getBlock().getState();
-		fur.setCookTime((short) 66);
+		fur.setCookTime((short) 133);
 		new BukkitRunnable() {
 			
 			@Override
@@ -216,14 +217,16 @@ public final class EventsHandler implements Listener {
 						droppedItems.setAmount(droppedBonus);
 						fur.getWorld().dropItem(fur.getLocation().add(0, 1, 0), droppedItems);
 					}
-				}		
+				}	
+				fur.getBlock().getState().update();
 			}
-		}.runTaskLater(Main.plugin, 2);		
+		}.runTaskLater(Main.plugin, 0);	
 	}
 	@EventHandler
 	public void furnaceBurn(FurnaceBurnEvent e) {
 		Furnace fur = (Furnace) e.getBlock().getState();
-		fur.setCookTime((short) 66);
+		fur.setCookTime((short) 133);
+		fur.update();
 	}
 	@EventHandler
     public void onFurnaceClick(InventoryClickEvent event) {
@@ -232,7 +235,8 @@ public final class EventsHandler implements Listener {
         if (blocktype.getType() == Material.FURNACE) {
             if ((event.getSlot() == 0 || event.getSlot() == 1) && event.getCursor().getType() != Material.AIR) {
                 Furnace furnace = (Furnace) blocktype.getState();
-                furnace.setCookTime((short) 66);
+                furnace.setCookTime((short) 133);
+                furnace.update();
             }
         }
     }

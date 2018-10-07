@@ -1,6 +1,7 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -12,15 +13,23 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.BlackKnight625.DuringGame.Team;
 import me.BlackKnight625.DuringGame.TeamColor;
+import net.minecraft.server.v1_13_R1.NBTTagCompound;
+import net.minecraft.server.v1_13_R1.NBTTagDouble;
+import net.minecraft.server.v1_13_R1.NBTTagInt;
+import net.minecraft.server.v1_13_R1.NBTTagList;
+import net.minecraft.server.v1_13_R1.NBTTagString;
 
 
 public class Utilities {
@@ -676,5 +685,95 @@ public class Utilities {
 			killed.damage(0.001, killer);
 	}
 	
+	public static ItemStack itemWithAddedAttribute(ItemStack item, Map<String, Double> nameAmount, String slot) {
+		
+		
+		
+		net.minecraft.server.v1_13_R1.ItemStack nmsStack;
+        NBTTagCompound compound;
+        NBTTagList modifiers;
+        
+        nmsStack = CraftItemStack.asNMSCopy(item);
+		compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+		modifiers = nmsStack.getEnchantments();
+		
+		Random rand = new Random();
+        for (String name : nameAmount.keySet()) {
+        	double amount = nameAmount.get(name);
+			
+			NBTTagCompound tagCompound = new NBTTagCompound();
+			tagCompound.set("AttributeName", new NBTTagString(name));
+			tagCompound.set("Name", new NBTTagString(name));
+			tagCompound.set("Amount", new NBTTagDouble((double)amount));
+			tagCompound.set("Operation", new NBTTagInt(0));
+			tagCompound.set("UUIDLeast", new NBTTagInt(rand.nextInt(100000) + 1));
+			tagCompound.set("UUIDMost", new NBTTagInt(rand.nextInt(100000) + 1));
+			tagCompound.set("Slot", new NBTTagString(slot));
+			modifiers.add(tagCompound);
+		}
+		compound.set("AttributeModifiers", modifiers);
+        nmsStack.setTag(compound);
+        item = CraftItemStack.asBukkitCopy(nmsStack);
+		return item;
+		//mainhand, offhand, head, chest, legs or feet
+	}
+	@SuppressWarnings("deprecation")
+	public static ItemStack customArmor(ArmorTier tier) {	
+		double protection = tier.getProtection();
+		int durability = tier.getDurability();
+		String special = tier.getSpecialAtribute();
+		double toughness = tier.getToughness();
+		ItemStack item;
+		String slot = "head";
 
+		int underline = tier.toString().indexOf("_");
+		String tierF = tier.toString().substring(0, underline);
+		String tierL = tier.toString().substring(underline + 1);
+		
+		if (tierF.equalsIgnoreCase("LEATHER") || tierF.equalsIgnoreCase("CHAINMAIL") || tierF.equalsIgnoreCase("IRON") || tierF.equalsIgnoreCase("GOLDEN") || tierF.equalsIgnoreCase("DIAMOND")) {
+			item = new ItemStack(Material.valueOf(tier.toString()));
+		}
+		else {
+			item = new ItemStack(Material.valueOf("DIAMOND_" + tierL));
+		}
+		switch (tierL) {
+		case "HELMET":
+			slot = "head";
+			break;
+		case "CHESTPLATE":
+			slot = "chest";
+			break;
+		case "LEGGINGS":
+			slot = "legs";
+			break;
+		case "BOOTS":
+			slot = "feet";
+			break;
+		}
+		
+		java.util.Map<String, Double> map = new java.util.HashMap<>();
+		map.put("generic.armor", protection);
+		map.put("generic.armorToughness", toughness);
+		ItemMeta meta = item.getItemMeta();
+		String name1 = tierF.charAt(0) + tierF.substring(1).toLowerCase();
+		String name2 = tierL.charAt(0) + tierL.substring(1).toLowerCase();
+		
+		
+		ArrayList<String> list = new ArrayList<>();
+		list.add(durability + "/" + durability);
+		list.add(special);
+		if (special != null) {
+			switch (special) {
+			case "Swift":
+				map.put("generic.movementSpeed", 0.002);
+			}
+		}
+		meta.setDisplayName(name1 + " " + name2);
+		meta.setUnbreakable(true);
+		item.setDurability((short) (item.getType().getMaxDurability() - durability));
+		meta.setLore(list);
+		item.setItemMeta(meta);
+		item = Utilities.itemWithAddedAttribute(item, map, slot);
+		return item;
+	}
 }
