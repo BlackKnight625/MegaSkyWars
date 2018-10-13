@@ -16,8 +16,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
-import org.bukkit.block.data.Rail;
-import org.bukkit.block.data.Rail.Shape;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -42,7 +40,6 @@ import net.minecraft.server.v1_13_R1.NBTTagList;
 import net.minecraft.server.v1_13_R1.NBTTagString;
 
 
-@SuppressWarnings("unused")
 public class Utilities {
 	
  	public static String getCardinalDirection(Player player) {
