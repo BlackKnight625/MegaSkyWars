@@ -1,18 +1,23 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.Rail;
+import org.bukkit.block.data.Rail.Shape;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -20,11 +25,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import CustomItems.ArmorTier;
 import CustomItems.ResourceType;
+import CustomItems.ToolTier;
 import me.BlackKnight625.DuringGame.Team;
 import me.BlackKnight625.DuringGame.TeamColor;
 import net.minecraft.server.v1_13_R1.NBTTagCompound;
@@ -34,9 +42,10 @@ import net.minecraft.server.v1_13_R1.NBTTagList;
 import net.minecraft.server.v1_13_R1.NBTTagString;
 
 
+@SuppressWarnings("unused")
 public class Utilities {
 	
-	public static String getCardinalDirection(Player player) {
+ 	public static String getCardinalDirection(Player player) {
         double rotation = (player.getLocation().getYaw() - 90) % 360;
         if (rotation < 0) {
             rotation += 360.0;
@@ -130,8 +139,7 @@ public class Utilities {
                 for(int z = minZ; z <= maxZ; z++){
  
                     Block b = block1.getWorld().getBlockAt(x, y, z);              
-                    blocks.add(b);    
-                    
+                    blocks.add(b);  
                 }
             }
         }
@@ -349,7 +357,152 @@ public class Utilities {
 		
 				b.setBlockData(bl);
 			}
-		
+			/*else if (b.getBlockData() instanceof Rail) {
+				Rail rail = (Rail) b.getBlockData();
+				
+				
+				
+				Shape shape = rail.getShape();
+				Shape s = null;
+				Bukkit.broadcastMessage("Previous shape: " + shape);
+				int underline = shape.toString().indexOf("_");
+				String shapeF = shape.toString().substring(0, underline);
+				String shapeL = shape.toString().substring(underline + 1);
+				String sF = shapeF;
+				String sL = shapeL;
+				if (shape.equals(Shape.NORTH_SOUTH)) {
+					switch (dir) {
+					case "E":
+					case "W":
+						s = Shape.EAST_WEST;
+						break;
+					case "N":
+					case "S":
+						s = Shape.NORTH_SOUTH;
+						break;
+					}
+				}			
+				else if (shape.equals(Shape.EAST_WEST)) {
+					switch (dir) {
+					case "E":
+					case "W":
+						s = Shape.NORTH_SOUTH;
+						break;
+					case "N":
+					case "S":
+						s = Shape.EAST_WEST;
+						break;
+					}
+				}	
+				else if (shapeF.equalsIgnoreCase("ASCENDING")) {
+					
+					//switch (dir) {
+					case "S":
+						break;
+					case "N":
+						switch (shapeL) {
+						case "NORTH":
+							sL = "SOUTH";
+							break;
+						case "SOUTH":
+							sL = "NORTH";
+							break;
+						case "EAST":
+							sL = "WEST";
+							break;
+						case "WEST":
+							sL = "EAST";
+							break;
+						}
+						break;
+					case "E":
+						switch (shapeL) {
+						case "NORTH":
+							sL = "WEST";
+							break;
+						case "SOUTH":
+							sL = "EAST";
+							break;
+						case "EAST":
+							sL = "NORTH";
+							break;
+						case "WEST":
+							sL = "SOUTH";
+							break;
+						}
+						break;
+					case "W":
+						switch (shapeL) {
+						case "NORTH":
+							sL = "EAST";
+							break;
+						case "SOUTH":
+							sL = "WEST";
+							break;
+						case "EAST":
+							sL = "SOUTH";
+							break;
+						case "WEST":
+							sL = "NORTH";
+							break;
+						}
+						break;
+					}
+					//s = Shape.valueOf(sF + "_" + sL);
+					s = Shape.NORTH_SOUTH;
+					Bukkit.broadcastMessage("New shape: " + s);
+				}
+				else {
+					switch (dir) {
+					case "SOUTH":
+						sF = shapeF;
+						sL = shapeL;
+						break;
+					case "NORTH":
+						switch (shapeF) {
+						case "SOUTH":
+							sF = "NORTH";
+							break;
+						case "NORTH":
+							sF = "SOUTH";
+							break;
+						}
+						switch (shapeL) {
+						case "WEST":
+							sL = "EAST";
+							break;
+						case "EAST":
+							sL = "WEST";
+							break;
+						}
+						break;
+					case "EAST":
+						sL = shapeL;
+						switch (shapeF) {
+						case "SOUTH":
+							sF = "NORTH";
+							break;
+						case "NORTH":
+							sF = "SOUTH";
+							break;
+						}
+						break;
+					case "WEST":
+						sF = shapeF;
+						switch (shapeL) {
+						case "WEST":
+							sL = "EAST";
+							break;
+						case "EAST":
+							sL = "WEST";
+							break;
+						}
+					}
+					s = Shape.valueOf(sF + "_" + sL);
+				}
+				rail.setShape(s);
+				b.setBlockData(rail);
+			}*/
 	}
 
 	public static void createFriendlyTeamMob(Team team, EntityType type, Location loc) {
@@ -749,14 +902,13 @@ public class Utilities {
         nmsStack.setTag(compound);
         item = CraftItemStack.asBukkitCopy(nmsStack);
 		return item;
-		//mainhand, offhand, head, chest, legs or feet
 	}
-	@SuppressWarnings("deprecation")
 	public static ItemStack customArmor(ArmorTier tier) {	
 		double protection = tier.getProtection();
 		int durability = tier.getDurability();
 		String special = tier.getSpecialAtribute();
 		double toughness = tier.getToughness();
+		int fakeDurability = tier.getFakeDurability();
 		ItemStack item;
 		String slot = "head";
 
@@ -768,7 +920,20 @@ public class Utilities {
 			item = new ItemStack(Material.valueOf(tier.toString()));
 		}
 		else {
-			item = new ItemStack(Material.valueOf("DIAMOND_" + tierL));
+			item = new ItemStack(Material.valueOf("LEATHER_" + tierL));
+			LeatherArmorMeta lmeta = (LeatherArmorMeta) item.getItemMeta();
+			Random rand = new Random();
+			int red = rand.nextInt(20) + 1 - 10;
+			int green = rand.nextInt(20) + 1 - 10;
+			int blue = rand.nextInt(20) + 1 - 10;
+			red = tier.getRed()+red<=0?0:red;
+			green = tier.getGreen()+green<=0?0:green;
+			blue = tier.getBlue()+blue<=0?0:blue;
+			red = tier.getRed()+red>=255?0:red;
+			green = tier.getGreen()+green>=255?0:green;
+			blue = tier.getBlue()+blue>=255?0:blue;
+			lmeta.setColor(Color.fromRGB(tier.getRed() + red, tier.getGreen() + green, tier.getBlue() + blue));
+			item.setItemMeta(lmeta);
 		}
 		switch (tierL) {
 		case "HELMET":
@@ -795,18 +960,53 @@ public class Utilities {
 		
 		ArrayList<String> list = new ArrayList<>();
 		list.add(durability + "/" + durability);
-		list.add(special);
+		
 		if (special != null) {
 			switch (special) {
 			case "Swift":
 				map.put("generic.movementSpeed", 0.002);
 			}
+			list.add(special);
 		}
 		meta.setDisplayName(name1 + " " + name2);
 		meta.setUnbreakable(true);
-		item.setDurability((short) (item.getType().getMaxDurability() - durability));
 		meta.setLore(list);
+		Damageable dam = (Damageable) meta;
+		dam.setDamage(fakeDurability);
 		item.setItemMeta(meta);
+		item.setItemMeta((ItemMeta) dam);
+		item = Utilities.itemWithAddedAttribute(item, map, slot);
+		return item;
+	}
+	public static ItemStack customTool(ToolTier tier) {
+		int durability = tier.getDurability();
+		int fakeDurability = tier.getFakeDurability();
+		double damage = tier.getDamage();
+		Material material = tier.getMaterial();
+		ItemStack item = new ItemStack(material);
+		String slot = "mainhand";
+
+		int underline = tier.toString().indexOf("_");
+		String tierF = tier.toString().substring(0, underline);
+		String tierL = tier.toString().substring(underline + 1);
+		
+		java.util.Map<String, Double> map = new java.util.HashMap<>();
+		map.put("generic.attackDamage", damage);
+		map.put("generic.attackSpeed", 50.0);
+		ItemMeta meta = item.getItemMeta();
+		String name1 = tierF.charAt(0) + tierF.substring(1).toLowerCase();
+		String name2 = tierL.charAt(0) + tierL.substring(1).toLowerCase();
+		
+		ArrayList<String> list = new ArrayList<>();
+		list.add(durability + "/" + durability);
+		
+		meta.setDisplayName(name1 + " " + name2);
+		meta.setUnbreakable(true);
+		meta.setLore(list);
+		Damageable dam = (Damageable) meta;
+		dam.setDamage(fakeDurability);
+		item.setItemMeta(meta);
+		item.setItemMeta((ItemMeta) dam);
 		item = Utilities.itemWithAddedAttribute(item, map, slot);
 		return item;
 	}
@@ -827,4 +1027,57 @@ public class Utilities {
 		
 		return item;
 	}
+	public static int getDurabilityFromLore(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		int durability = 0;
+		if (meta.hasLore()) {
+			String lore = meta.getLore().get(0);
+			int slash = lore.indexOf("/");
+			String loreI = lore.substring(0, slash);
+			durability = Integer.parseInt(loreI);
+		}
+		return durability;
+	}
+	public static int getMaxDurabilityFromLore(ItemStack item) {
+		ItemMeta meta = item.getItemMeta();
+		int durability = 0;
+		if (meta.hasLore()) {
+			String lore = meta.getLore().get(0);
+			int slash = lore.indexOf("/");
+			String loreF = lore.substring(slash + 1);
+			durability = Integer.parseInt(loreF);
+		}
+		return durability;
+	}
+	public static void updateDurabilityInLore(ItemStack item, int decrement, Player p) {
+		ItemMeta meta = item.getItemMeta();
+		if (meta.hasLore()) {
+			String lore = meta.getLore().get(0);
+			int slash = lore.indexOf("/");
+			String loreI = lore.substring(0, slash);
+			String loreF = lore.substring(slash + 1);
+			int durability = Integer.parseInt(loreI);
+			if (-decrement + durability <= Integer.parseInt(loreF)) {
+				durability = durability - decrement;
+				if (durability == 0) {
+					int i = 0;
+					while (i < p.getInventory().getSize()) {
+						if (p.getInventory().getItem(i) != null && p.getInventory().getItem(i).equals(item)) {
+							p.getInventory().setItem(i, new ItemStack(Material.AIR));	
+						}
+						i++;
+					}
+					p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, (float) 0.5, 1);
+				}
+				else {
+					lore = durability + "/" + loreF;
+					List<String> loreL = meta.getLore();
+					loreL.set(0, lore);
+					meta.setLore(loreL);
+					item.setItemMeta(meta);
+				}
+			}
+		}
+	}
+
 }

@@ -1,6 +1,7 @@
 package me.BlackKnight625.MegaSkyWars;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 import org.bukkit.Bukkit;
@@ -10,13 +11,17 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Hopper;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Snowball;
+import org.bukkit.entity.Trident;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,24 +31,32 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import CustomItems.ArmorTier;
 import CustomItems.ResourceType;
+import CustomItems.ToolTier;
 import me.BlackKnight625.DuringGame.Team;
 
 @SuppressWarnings("unused")
 public final class EventsHandler implements Listener {
+	
+	
 	public EventsHandler(Main plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
+
 	
 	@EventHandler
 	public void blockBreakEvent(BlockBreakEvent e) {
@@ -85,6 +98,22 @@ public final class EventsHandler implements Listener {
 			}
 			e.setDropItems(false);
 			b.getWorld().dropItem(b.getLocation().add(0.5, 0.5, 0.5), drop);
+		}
+		if (p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore()) {
+			int unbreaking = 1;
+			ItemStack item = p.getInventory().getItemInMainHand();
+			if (ToolTier.materialIsATool(item.getType())) {
+				ItemMeta meta = item.getItemMeta();
+				if (meta.hasEnchant(Enchantment.DURABILITY)) {
+					unbreaking = meta.getEnchantLevel(Enchantment.DURABILITY) + 1;
+				}
+				Random rand = new Random();
+				int odds = rand.nextInt(100) + 1;
+				double odds2 = (1/(double)unbreaking) * 100.0;
+				if (odds <= odds2) {
+					Utilities.updateDurabilityInLore(item, 1, p);
+				}
+			}
 		}
 	}
 	
@@ -134,40 +163,106 @@ public final class EventsHandler implements Listener {
 							}
 						}
 					}
-				}		
-			
-	
-				
+				}				
 	}
 
 	@EventHandler
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		Entity damaged = e.getEntity();
 		Entity damager = e.getDamager();
-		if (damager instanceof Player) {
-			Player p = (Player) damager;
-			if (Team.objectIsInATeam(damager)) {
-				
-				if (Team.objectIsInSameTeamAs(p, damaged)) {
-					e.setCancelled(true);
+		if (Team.objectIsInSameTeamAs(damaged, damager)) {
+			e.setCancelled(true);
+		}
+		
+		if (damager instanceof Projectile) {	
+			Projectile pro = (Projectile) damager;
+			if (damager instanceof Trident) {
+				Trident tri = (Trident) pro;
+				if (tri.hasMetadata("Damage") && Main.getMetadata(tri, "Damage") != null) {
+					double damage = (double) Main.getMetadata(tri, "Damage");
+					e.setDamage(damage);
 				}
-				if (damaged instanceof Player) {
-					
-					new BukkitRunnable() {
+			}
+			if (pro.getShooter() instanceof Player) {
+				Player p = (Player) pro.getShooter();
+				if (Team.objectIsInATeam(damager)) {
+					if (damaged instanceof Player) {
 						
-						@Override
-						public void run() {
-							Utilities.setKiller((Player) damager, (Player) damaged);
+						new BukkitRunnable() {
 							
-						}
-					}.runTaskLater(Main.plugin, 1);
+							@Override
+							public void run() {
+								Utilities.setKiller((Player) damager, (Player) damaged);
+								
+							}
+						}.runTaskLater(Main.plugin, 1);
+					}
 				}
 			}
 		}
-		else if (damager instanceof Entity) {
-			if (Team.objectIsInSameTeamAs(damaged, damager)) {
-				e.setCancelled(true);
+		if (damaged instanceof Player) {
+			Player p = (Player) damaged;
+			for (ItemStack armor : p.getInventory().getArmorContents()) {
+				int unbreaking = 1;
+				ItemMeta meta = armor.getItemMeta();
+				if (meta.hasEnchant(Enchantment.DURABILITY)) {
+					unbreaking = meta.getEnchantLevel(Enchantment.DURABILITY) + 1;
+				}
+				Random rand = new Random();
+				int odds = rand.nextInt(100) + 1;
+				double odds2 = (1/(double)unbreaking) * 100.0;
+				if (odds <= odds2) {
+					Utilities.updateDurabilityInLore(armor, 1, p);
+				}
 			}
+		}
+		if (damager instanceof Player) {
+			Player p = (Player) damager;
+			if (ToolTier.materialIsATool(p.getInventory().getItemInMainHand().getType())) {
+				int unbreaking = 1;
+				ItemStack item = p.getInventory().getItemInMainHand();
+				ItemMeta meta = item.getItemMeta();
+				if (meta.hasEnchant(Enchantment.DURABILITY)) {
+					unbreaking = meta.getEnchantLevel(Enchantment.DURABILITY) + 1;
+				}
+				Random rand = new Random();
+				int odds = rand.nextInt(100) + 1;
+				double odds2 = (1/(double)unbreaking) * 100.0;
+				if (odds <= odds2) {
+					Utilities.updateDurabilityInLore(item, 1, p);
+				}
+			}
+		}
+	}
+	@EventHandler
+	public void projectileLaunchEvent(ProjectileLaunchEvent e) {
+		Projectile pro = e.getEntity();
+		if (pro.getShooter() instanceof Entity) {
+			Entity ent = (Entity) pro.getShooter();
+			if (Team.objectIsInATeam(ent)) {
+				Team.setTeamColorToObject(pro, Team.getTeamColorOfObject(ent));
+			}
+		}	
+		if (pro instanceof Trident) {
+			Trident tri = (Trident) pro;
+			if (tri.getShooter() instanceof Player) {
+				Player p = (Player) tri.getShooter();
+				int space = 0;
+				String triName = p.getInventory().getItemInMainHand().getItemMeta().getDisplayName();
+				for(int i = 0; i < triName.length(); i++){
+		            if(Character.isWhitespace(triName.charAt(i))){
+		                space = i;
+		            }
+		        }
+				String tierF = triName.substring(0, space);
+				String name = tierF.toUpperCase() + "_SPEAR";
+				for (ToolTier tier : ToolTier.values()) {
+					if (tier.toString().equalsIgnoreCase(name)) {
+						double damage = tier.getDamage();
+						Main.setMetadata(tri, "Damage", damage);
+					} 
+				}
+			}	
 		}
 	}
 	
@@ -221,9 +316,10 @@ public final class EventsHandler implements Listener {
 						}
 					}.runTaskLater(Main.plugin, 4);
 				}
-			} 
+			} 		
 		}
 	}
+
 
 	@EventHandler
 	public void furnaceSmelt(FurnaceSmeltEvent e) {
@@ -261,7 +357,6 @@ public final class EventsHandler implements Listener {
 			@Override
 			public void run() {
 				Furnace fur = (Furnace) e.getBlock().getState();
-				Bukkit.broadcastMessage("Initial burn time: " + fur.getBurnTime());
 				int iBurn = fur.getBurnTime();
 				int fBurn = iBurn/3;
 				fur.setBurnTime((short) fBurn);
@@ -356,7 +451,7 @@ public final class EventsHandler implements Listener {
 				if (!picker.getName().equalsIgnoreCase(dropper.getName())) {
 					int iniAge = (int) Main.getMetadata(item, "Age");
 					int curAge = item.getTicksLived();
-					if ((curAge - iniAge) <= 80) {
+					if ((curAge - iniAge) <= 60) {
 						e.setCancelled(true);
 					}
 				}

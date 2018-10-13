@@ -23,6 +23,8 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.material.Wool;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.Rail;
+import org.bukkit.block.data.Rail.Shape;
 import org.bukkit.util.Vector;
 
 import me.BlackKnight625.MegaSkyWars.Main;
@@ -274,11 +276,23 @@ public class Structure {
 			z1 = 6;
 			
 			x2 = 98;
-			y2 = 7;
+			y2 = 8;
 			z2 = 22;
 			
 			farAway = 1;
 			downwards = 3;
+			break;
+		case RAILWAY_STAIRCASE:
+			x1 = 96;
+			y1 = 4;
+			z1 = 25;
+			
+			x2 = 98;
+			y2 = 14;
+			z2 = 33;
+			
+			farAway = 1;
+			downwards = 2;
 			break;
 		case STAIRCASE:
 			x1 = 24;
@@ -364,6 +378,18 @@ public class Structure {
 			
 			farAway = -3;
 			downwards = 0;
+			break;
+		case TNT_CANNON_UP:
+			x1 = 59;
+			y1 = 4;
+			z1 = 18;
+			
+			x2 = 69;
+			y2 = 7;
+			z2 = 28;
+			
+			farAway = 0;
+			downwards = 1;
 			break;
 		case WALL_5X5:
 			x1 = 29;
@@ -600,12 +626,29 @@ public class Structure {
 					Block block = itb.next();
 					Location l = itl.next();
 					Block b = l.getBlock();
-					if (!(l.equals(builder.getLocation()) || l.equals(builder.getEyeLocation()))) {
-						
-					}
 					
 					b.setType(block.getType());
-					b.setBlockData(block.getBlockData());
+					if (!(b.getBlockData() instanceof Rail)) {
+						b.setBlockData(block.getBlockData());
+					}
+					else {
+						Rail rail = (Rail) b.getBlockData();
+						Shape s = null;
+						switch (dir) {
+						case "E":
+						case "W":
+							s = Shape.EAST_WEST;
+							break;
+						case "N":
+						case "S":
+							s = Shape.NORTH_SOUTH;
+							break;
+						}
+						rail.setShape(s);
+						b.setBlockData(rail);
+					}
+						
+					
 					
 					if (b.getType().toString().contains("WOOL")) {
 						b.setType(Material.valueOf(color.toString() + "_WOOL"));
@@ -618,6 +661,7 @@ public class Structure {
 					}
 					else if (b.getType().toString().contains("BANNER")) {
 						b.setType(Material.valueOf(color.toString() + "_BANNER"));
+						Banner banner = (Banner) b.getBlockData();
 					}
 					
 					if (b.getType().equals(Material.DISPENSER)) {
@@ -632,12 +676,10 @@ public class Structure {
 						d.getInventory().addItem(tnt);
 					}
 					
+					
 					Utilities.rotateBlock(b, dir);
 					dealWithSpecialBlock(b);
 					
-					if (b.getType().toString().contains("FENCE")) {
-						
-					}
 					
 					b.getState().update();
 					

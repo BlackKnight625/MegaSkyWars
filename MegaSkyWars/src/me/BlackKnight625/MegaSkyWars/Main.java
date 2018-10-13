@@ -1,5 +1,6 @@
 package me.BlackKnight625.MegaSkyWars;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +29,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
 
 import CustomItems.ArmorTier;
+import CustomItems.OreType;
 import CustomItems.ResourceType;
+import CustomItems.ToolTier;
 import me.BlackKnight625.DuringGame.Structure;
 import me.BlackKnight625.DuringGame.StructureType;
 import me.BlackKnight625.DuringGame.Team;
@@ -146,7 +149,7 @@ public class Main extends JavaPlugin implements Listener {
 					craftItem = Material.LEATHER;
 					break;
 				case "TIN":
-					craftItem = Material.RABBIT_HIDE;
+					craftItem = ResourceType.TIN_INGOT.getMaterial();
 					break;
 				case "GOLDEN":
 					craftItem = Material.GOLD_INGOT;
@@ -155,10 +158,10 @@ public class Main extends JavaPlugin implements Listener {
 					craftItem = Material.IRON_NUGGET;
 					break;
 				case "COPPER":
-					craftItem = Material.FERMENTED_SPIDER_EYE;
+					craftItem = ResourceType.COPPER_INGOT.getMaterial();
 					break;
 				case "BRONZE":
-					craftItem = Material.PHANTOM_MEMBRANE;
+					craftItem = ResourceType.BRONZE_INGOT.getMaterial();
 					break;
 				case "QUARTZ":
 					craftItem = Material.QUARTZ;
@@ -170,13 +173,13 @@ public class Main extends JavaPlugin implements Listener {
 					craftItem = Material.PRISMARINE_SHARD;
 					break;
 				case "MITHRIL":
-					craftItem = Material.GHAST_TEAR;
+					craftItem = ResourceType.MITHRIL_INGOT.getMaterial();
 					break;
 				case "DIAMOND":
 					craftItem = Material.DIAMOND;
 					break;
 				case "ONYX":
-					craftItem = Material.HEART_OF_THE_SEA;
+					craftItem = ResourceType.ONYX_GEM.getMaterial();
 					break;
 				}
 				
@@ -209,6 +212,135 @@ public class Main extends JavaPlugin implements Listener {
 					}
 
 				getServer().addRecipe(recipe);
+			}
+			for (ToolTier tier : ToolTier.values()) {
+				
+				int underline = tier.toString().indexOf("_");
+				String tierF = tier.toString().substring(0, underline);
+				String tierL = tier.toString().substring(underline + 1);	
+				ItemStack result = Utilities.customTool(tier);
+				ArrayList<Material> craftItems = new ArrayList<>();	        
+				
+				switch (tierF) {
+				case "WOODEN":
+					craftItems.add(Material.OAK_PLANKS);
+					craftItems.add(Material.DARK_OAK_PLANKS);
+					craftItems.add(Material.BIRCH_PLANKS);
+					craftItems.add(Material.ACACIA_PLANKS);
+					craftItems.add(Material.JUNGLE_PLANKS);
+					craftItems.add(Material.SPRUCE_PLANKS);
+					break;
+				case "TIN":
+					craftItems.add(ResourceType.TIN_INGOT.getMaterial());
+					break;
+				case "GOLDEN":
+					craftItems.add(Material.GOLD_INGOT);
+					break;
+				case "STONE":
+					craftItems.add(Material.COBBLESTONE);
+					craftItems.add(Material.DIORITE);
+					craftItems.add(Material.ANDESITE);
+					craftItems.add(Material.GRANITE);
+					break;
+				case "COPPER":
+					craftItems.add(ResourceType.COPPER_INGOT.getMaterial());
+					break;
+				case "BRONZE":
+					craftItems.add(ResourceType.BRONZE_INGOT.getMaterial());
+					break;
+				case "QUARTZ":
+					craftItems.add(Material.QUARTZ);
+					break;
+				case "IRON":
+					craftItems.add(Material.IRON_INGOT);
+					break;
+				case "PRISMARINE":
+					craftItems.add(Material.PRISMARINE_SHARD);
+					break;
+				case "MITHRIL":
+					craftItems.add(ResourceType.MITHRIL_INGOT.getMaterial());
+					break;
+				case "DIAMOND":
+					craftItems.add(Material.DIAMOND);
+					break;
+				case "ONYX":
+					craftItems.add(ResourceType.ONYX_GEM.getMaterial());
+					break;
+				}
+				
+				
+				for (Material craftItem : craftItems) {
+					recipeID++;
+					NamespacedKey key = new NamespacedKey(plugin, tier.toString().toLowerCase() + recipeID);
+					NamespacedKey key2 = new NamespacedKey(plugin, tier.toString().toLowerCase() + (recipeID + 20));
+					NamespacedKey key3 = new NamespacedKey(plugin, tier.toString().toLowerCase() + (recipeID + 40));
+					ShapedRecipe recipe = new ShapedRecipe(key, result);
+					
+					switch (tierL) {
+					case "AXE":
+						recipe.shape("xx ", "xy ", " y ");
+						recipe.setIngredient('x', craftItem);
+						recipe.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe);
+						ShapedRecipe recipe2 = new ShapedRecipe(key2, result);
+						recipe2.shape(" xx", " yx", " y ");
+						recipe2.setIngredient('x', craftItem);
+						recipe2.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe2);
+						break;
+					case "PICKAXE":
+						recipe.shape("xxx", " y ", " y ");
+						recipe.setIngredient('x', craftItem);
+						recipe.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe);
+						break;
+					case "SHOVEL":
+						recipe.shape("x  ", "y  ", "y  ");
+						recipe.setIngredient('x', craftItem);
+						recipe.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe);
+						ShapedRecipe recipe3 = new ShapedRecipe(key2, result);
+						recipe3.shape(" x ", " y ", " y ");
+						recipe3.setIngredient('x', craftItem);
+						recipe3.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe3);
+						ShapedRecipe recipe4 = new ShapedRecipe(key3, result);
+						recipe4.shape("x  ", "y  ", "y  ");
+						recipe4.setIngredient('x', craftItem);
+						recipe4.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe4);
+						break;
+					case "SWORD":
+						recipe.shape("x  ", "x  ", "y  ");
+						recipe.setIngredient('x', craftItem);
+						recipe.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe);
+						ShapedRecipe recipe5 = new ShapedRecipe(key2, result);
+						recipe5.shape(" x ", " x ", " y ");
+						recipe5.setIngredient('x', craftItem);
+						recipe5.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe5);
+						ShapedRecipe recipe6 = new ShapedRecipe(key3, result);
+						recipe6.shape("x  ", "x  ", "y  ");
+						recipe6.setIngredient('x', craftItem);
+						recipe6.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe6);
+						break;
+					case "SPEAR":
+						recipe.shape("x  ", " y ", "  y");
+						recipe.setIngredient('x', craftItem);
+						recipe.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe);
+						ShapedRecipe recipe7 = new ShapedRecipe(key2, result);
+						recipe7.shape("  x", " y ", "y  ");
+						recipe7.setIngredient('x', craftItem);
+						recipe7.setIngredient('y', Material.STICK);
+						getServer().addRecipe(recipe7);
+						break;
+					}
+				}
+
+				
 			}
 				
 			}
@@ -243,9 +375,13 @@ public class Main extends JavaPlugin implements Listener {
 				if (isPlayer) {
 					
 					Player p = (Player) sender;
+					for (ToolTier tier : ToolTier.values()) {
+						ItemStack item = Utilities.customTool(tier);
+						p.getWorld().dropItem(p.getLocation(), item);
+					}
 					for (ArmorTier tier : ArmorTier.values()) {
 						ItemStack item = Utilities.customArmor(tier);
-						p.getInventory().addItem(item);
+						p.getWorld().dropItem(p.getLocation(), item);
 					}
 					
 					
@@ -256,10 +392,7 @@ public class Main extends JavaPlugin implements Listener {
 			else if (c.equalsIgnoreCase("oioi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					if (Team.playerIsInATeam(p)) {
-						Team team = Team.getTeamOfPlayer(p);
-						team.setCommunityChest(p.getLocation().getBlock().getLocation().add(0, 0, 0));
-					}
+					p.sendMessage("Fake durability: " + p.getInventory().getItemInMainHand().getDurability());
 					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}

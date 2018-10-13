@@ -1,4 +1,4 @@
-package me.BlackKnight625.MegaSkyWars;
+package CustomItems;
 
 import org.bukkit.Material;
 
@@ -14,6 +14,7 @@ public enum OreType {
 	GOLD(Material.GOLD_ORE, false, false, 18, 26),
 	REDSTONE(Material.REDSTONE_ORE, true, false, 2, 4),
 	LAPIS(Material.LAPIS_ORE, true, false, 5, 8),
+	QUARTZ(Material.NETHER_QUARTZ_ORE, true, false, 24, 32),
 	DIAMOND(Material.DIAMOND_ORE, true, false, 5, 10),
 	EMERALD(Material.EMERALD_ORE, true, false, 4, 8);
 	
