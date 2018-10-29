@@ -392,7 +392,8 @@ public class Main extends JavaPlugin implements Listener {
 			else if (c.equalsIgnoreCase("oioi")) {
 				if (isPlayer) {
 					Player p = (Player) sender;
-					p.sendMessage("Fake durability: " + p.getInventory().getItemInMainHand().getDurability());
+					Team team = Team.getTeamOfPlayer(p);
+					team.setCommunityChest(p.getLocation().add(0, -1, 0));
 					return true;
 				}
 				else {sender.sendMessage("Sender must be a player!"); return false;}

@@ -864,9 +864,9 @@ public class Utilities {
 		}
 	}
 	public static void setKiller(Player killer, Player killed) {
+			Bukkit.broadcastMessage("Killer set.");
 			Main.setMetadata(killed, "Killer", killer);
 			Main.setMetadata(killed, "Age", killed.getTicksLived());
-			killed.damage(0.001, killer);
 	}
 	
 	public static ItemStack itemWithAddedAttribute(ItemStack item, Map<String, Double> nameAmount, String slot) {
@@ -876,7 +876,7 @@ public class Utilities {
 		net.minecraft.server.v1_13_R1.ItemStack nmsStack;
         NBTTagCompound compound;
         NBTTagList modifiers;
-        
+ 
         nmsStack = CraftItemStack.asNMSCopy(item);
 		compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
 		modifiers = nmsStack.getEnchantments();

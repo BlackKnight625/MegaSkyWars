@@ -126,11 +126,14 @@ public final class EventsHandler implements Listener {
 			int timeOfLastHit = (int) Main.getMetadata(p, "Age");
 			int timeOfDeath = p.getTicksLived();
 			int timeSinceLastHit = timeOfDeath - timeOfLastHit;			
-			
+			Bukkit.broadcastMessage("Time of last hit: " + timeOfLastHit);
+			Bukkit.broadcastMessage("Time of death: " + timeOfDeath);
+			Bukkit.broadcastMessage("Time since last hit: " + timeSinceLastHit);
 			if (timeSinceLastHit <= 600) {
 				k = (Player) Main.getMetadata(p, "Killer");
 			}
 		}
+		Bukkit.broadcastMessage("Killer: " + k);
 				int odds = rand.nextInt(1000) + 1;
 				if (k != null) {
 					if (k.getType().equals(EntityType.PLAYER)) {
@@ -148,7 +151,7 @@ public final class EventsHandler implements Listener {
 								}
 							}
 							if (p.getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.VOID)) {
-								e.setDeathMessage("You thrown into the void by " + killer.getName() + ". 30% of your items"
+								e.setDeathMessage("You were thrown into the void by " + killer.getName() + ". 30% of your items"
 										+ " have been placed in his team's community chest.");
 								ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 								for (ItemStack item : e.getDrops()) {
@@ -161,6 +164,12 @@ public final class EventsHandler implements Listener {
 									team.putItemsInsideCommunityChest(items);
 								}
 							}
+							else if (p.getLastDamageCause().getCause().equals(EntityDamageEvent.DamageCause.PROJECTILE)) {
+								e.setDeathMessage("You were shot by " + killer.getName() + ".");
+							}
+							else {
+								e.setDeathMessage("You were killed by " + killer.getName() + ".");
+							}
 						}
 					}
 				}				
@@ -170,6 +179,7 @@ public final class EventsHandler implements Listener {
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		Entity damaged = e.getEntity();
 		Entity damager = e.getDamager();
+		Bukkit.broadcastMessage("Damaged: + " + damaged + "   Damager: " + damager);
 		if (Team.objectIsInSameTeamAs(damaged, damager)) {
 			e.setCancelled(true);
 		}
@@ -185,40 +195,40 @@ public final class EventsHandler implements Listener {
 			}
 			if (pro.getShooter() instanceof Player) {
 				Player p = (Player) pro.getShooter();
-				if (Team.objectIsInATeam(damager)) {
-					if (damaged instanceof Player) {
-						
-						new BukkitRunnable() {
-							
-							@Override
-							public void run() {
-								Utilities.setKiller((Player) damager, (Player) damaged);
-								
-							}
-						}.runTaskLater(Main.plugin, 1);
+				if (Team.objectIsInATeam(damager) && Team.objectIsInATeam(damaged) && 
+						!Team.getTeamColorOfObject(damager).equals(Team.getTeamColorOfObject(damaged)
+						)) {
+					if (damaged instanceof Player) {	
+						Utilities.setKiller(p, (Player) damaged);
 					}
 				}
 			}
 		}
 		if (damaged instanceof Player) {
 			Player p = (Player) damaged;
-			for (ItemStack armor : p.getInventory().getArmorContents()) {
-				int unbreaking = 1;
-				ItemMeta meta = armor.getItemMeta();
-				if (meta.hasEnchant(Enchantment.DURABILITY)) {
-					unbreaking = meta.getEnchantLevel(Enchantment.DURABILITY) + 1;
-				}
-				Random rand = new Random();
-				int odds = rand.nextInt(100) + 1;
-				double odds2 = (1/(double)unbreaking) * 100.0;
-				if (odds <= odds2) {
-					Utilities.updateDurabilityInLore(armor, 1, p);
-				}
+			
+				for (ItemStack armor : p.getInventory().getArmorContents()) {
+					if (armor != null) {
+						int unbreaking = 1;
+						ItemMeta meta = armor.getItemMeta();
+						if (meta.hasEnchant(Enchantment.DURABILITY)) {
+							unbreaking = meta.getEnchantLevel(Enchantment.DURABILITY) + 1;
+						}
+						Random rand = new Random();
+						int odds = rand.nextInt(100) + 1;
+						double odds2 = (1 / (double) unbreaking) * 100.0;
+						if (odds <= odds2) {
+							Utilities.updateDurabilityInLore(armor, 1, p);
+						} 
+					}
+				} 
+			if (damager instanceof Player) {
+					Utilities.setKiller((Player)damager, (Player)damaged);	
 			}
 		}
 		if (damager instanceof Player) {
 			Player p = (Player) damager;
-			if (ToolTier.materialIsATool(p.getInventory().getItemInMainHand().getType())) {
+			if (p.getInventory().getItemInMainHand() != null && ToolTier.materialIsATool(p.getInventory().getItemInMainHand().getType())) {
 				int unbreaking = 1;
 				ItemStack item = p.getInventory().getItemInMainHand();
 				ItemMeta meta = item.getItemMeta();

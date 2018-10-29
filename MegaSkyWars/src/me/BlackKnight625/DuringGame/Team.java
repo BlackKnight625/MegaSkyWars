@@ -250,7 +250,7 @@ public class Team {
 					if (e.hasMetadata("Team")) {
 						String name = e.getCustomName();
 						for (Team te : Team.teams) {
-							if (name.toLowerCase().contains(team.getColor().toLowerCase())) {
+							if (name != null && name.toLowerCase().contains(team.getColor().toLowerCase())) {
 								te.friendlyMobs.add((Monster) e);
 								Main.setMetadata(e, "Team", team.getTeamColor());
 							}
