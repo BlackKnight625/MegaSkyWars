@@ -119,6 +119,7 @@ public final class EventsHandler implements Listener {
 	
 	@EventHandler
 	public void playerDieEvent(PlayerDeathEvent e) {
+		
 		Random rand = new Random();	
 		Player p = e.getEntity();
 		Entity k = null;
@@ -179,7 +180,6 @@ public final class EventsHandler implements Listener {
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		Entity damaged = e.getEntity();
 		Entity damager = e.getDamager();
-		Bukkit.broadcastMessage("Damaged: + " + damaged + "   Damager: " + damager);
 		if (Team.objectIsInSameTeamAs(damaged, damager)) {
 			e.setCancelled(true);
 		}
@@ -278,7 +278,7 @@ public final class EventsHandler implements Listener {
 	
 	@EventHandler
 	public void entityDamageEvent(EntityDamageEvent e) {
-		if (e.getCause().equals(DamageCause.BLOCK_EXPLOSION)) {
+		if (e.getCause().equals(DamageCause.ENTITY_EXPLOSION)) {
 			double damage = e.getDamage();
 			damage = 0.4 * damage;
 			e.setDamage(damage);
