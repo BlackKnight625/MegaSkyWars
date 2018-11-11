@@ -864,7 +864,6 @@ public class Utilities {
 		}
 	}
 	public static void setKiller(Player killer, Player killed) {
-			Bukkit.broadcastMessage("Killer set.");
 			Main.setMetadata(killed, "Killer", killer);
 			Main.setMetadata(killed, "Age", killed.getTicksLived());
 	}

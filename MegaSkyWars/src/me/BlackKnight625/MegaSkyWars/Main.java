@@ -61,7 +61,7 @@ public class Main extends JavaPlugin implements Listener {
 		}.runTaskLater(plugin, 2);
 			
 
-		
+		//Friendly mobs
 		new BukkitRunnable() {
 			
 			@Override
@@ -80,13 +80,14 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 		}.runTaskTimer(this, 10, 20);
-		
+		//Recipes
 		new BukkitRunnable() {
 			
 			
 			
 			@Override
 			public void run() {
+				//Removes vanilla armor recipes
 				for (ArmorTier tier : ArmorTier.values()) {
 					ItemStack result = Utilities.customArmor(tier);
 					Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
@@ -100,24 +101,24 @@ public class Main extends JavaPlugin implements Listener {
 							}
 			        }
 				}
+	
+				//Replaces smelting recipes' smelting time 
 				Iterator<Recipe> it = Bukkit.getServer().recipeIterator();
 				while (it.hasNext()) {
 					Recipe rec = it.next();
 					if (rec instanceof FurnaceRecipe) {	
-						if (!rec.getResult().isSimilar(new ItemStack(Material.CHARCOAL)) && !rec.getResult().isSimilar(new ItemStack(Material.IRON_NUGGET))) {
-							it.remove();
-							((FurnaceRecipe) rec).setCookingTime(66);
-							new BukkitRunnable() {
-
-								@Override
-								public void run() {
-									getServer().addRecipe(rec);
-
-								}
-							}.runTaskLater(plugin, 5);
-						}
+						it.remove();
+						((FurnaceRecipe) rec).setCookingTime(66);
+						new BukkitRunnable() {
+								
+							@Override
+							public void run() {
+								getServer().addRecipe(rec);
+							}
+						}.runTaskLater(plugin, 5);	
 					}
 				}
+			//Creates smelting recipes for custom ores/ingots
 			for (ResourceType type : ResourceType.values()) {
 				recipeID++;
 				int underline = type.toString().indexOf("_");
@@ -131,7 +132,7 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}		
 				
-			
+			//Creates crafting recipes for custom armor
 			for (ArmorTier tier : ArmorTier.values()) {
 				recipeID++;
 				int underline = tier.toString().indexOf("_");

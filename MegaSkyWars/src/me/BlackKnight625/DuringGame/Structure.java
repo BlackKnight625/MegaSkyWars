@@ -13,6 +13,7 @@ import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -385,7 +386,7 @@ public class Structure {
 			z1 = 18;
 			
 			x2 = 69;
-			y2 = 7;
+			y2 = 8;
 			z2 = 28;
 			
 			farAway = 0;
@@ -664,7 +665,12 @@ public class Structure {
 						Banner banner = (Banner) b.getBlockData();
 					}
 					
-					if (b.getType().equals(Material.DISPENSER)) {
+					else if (b.getState() instanceof Container) {
+						Container c = (Container) b.getState();
+						c.getInventory().setContents(((Container) block.getState()).getInventory().getContents());
+					}
+					
+					/*if (b.getType().equals(Material.DISPENSER)) {
 						Dispenser d = (Dispenser) b.getState();
 						ItemStack tnt = new ItemStack(Material.TNT, 3);;
 						if (structureType.equals(StructureType.TNT_CANNON_3)) {
@@ -674,7 +680,7 @@ public class Structure {
 							tnt = new ItemStack(Material.TNT, 8);
 						}
 						d.getInventory().addItem(tnt);
-					}
+					}*/
 					
 					
 					Utilities.rotateBlock(b, dir);
