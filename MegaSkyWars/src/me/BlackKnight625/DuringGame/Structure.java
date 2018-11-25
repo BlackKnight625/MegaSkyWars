@@ -59,7 +59,18 @@ public class Structure {
 		if (!Team.playerIsInATeam(player)) {
 			throw new ArithmeticException("The Structure builder player does not belong in a team.");
 		}
-		structureType = type;
+		if (type.equals(StructureType.STONE_BRIDGE) || type.equals(StructureType.WOODEN_BRIDGE)) {
+			String dir = Utilities.getAproximateCardinalDirection(player);
+			if (dir == "NW" || dir == "NE" || dir == "SW" || dir == "SE") {
+				structureType = StructureType.valueOf(type.toString() + "_DIAGONAL");
+			}
+			else {
+				structureType = type;
+			}
+		}
+		else {
+			structureType = type;
+		}
 		builder = player;
 		team = Team.getTeamOfPlayer(player);
 		color = Team.getPlayerTeamColor(player);
@@ -669,18 +680,6 @@ public class Structure {
 						Container c = (Container) b.getState();
 						c.getInventory().setContents(((Container) block.getState()).getInventory().getContents());
 					}
-					
-					/*if (b.getType().equals(Material.DISPENSER)) {
-						Dispenser d = (Dispenser) b.getState();
-						ItemStack tnt = new ItemStack(Material.TNT, 3);;
-						if (structureType.equals(StructureType.TNT_CANNON_3)) {
-							tnt = new ItemStack(Material.TNT, 4);
-						}
-						else if (structureType.equals(StructureType.TNT_CANNON_LOW)) {
-							tnt = new ItemStack(Material.TNT, 8);
-						}
-						d.getInventory().addItem(tnt);
-					}*/
 					
 					
 					Utilities.rotateBlock(b, dir);

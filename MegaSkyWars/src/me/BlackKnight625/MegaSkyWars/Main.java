@@ -214,6 +214,7 @@ public class Main extends JavaPlugin implements Listener {
 
 				getServer().addRecipe(recipe);
 			}
+			//Creates crafting recipes for custom tools
 			for (ToolTier tier : ToolTier.values()) {
 				
 				int underline = tier.toString().indexOf("_");

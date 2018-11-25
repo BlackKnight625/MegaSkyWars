@@ -65,8 +65,8 @@ public class OreGenerator {
 						Collections.shuffle(adjacent);
 						for (Block adj : adjacent) {
 							Random random = new Random();
-							boolean odds = random.nextBoolean();
-							if (odds && ammount > 0 && gen > 0) {
+							int odds = random.nextInt(100) + 1;
+							if (odds <= 70 && ammount > 0 && gen > 0) {
 								adj.setType(material);
 								ammount--;
 								gen--;

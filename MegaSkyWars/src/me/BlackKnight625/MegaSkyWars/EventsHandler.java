@@ -9,8 +9,10 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Hopper;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -25,11 +27,15 @@ import org.bukkit.entity.Trident;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
@@ -40,6 +46,7 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
 import org.bukkit.event.inventory.FurnaceSmeltEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -47,6 +54,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import CustomItems.ArmorTier;
 import CustomItems.ResourceType;
 import CustomItems.ToolTier;
+import me.BlackKnight625.DuringGame.Structure;
+import me.BlackKnight625.DuringGame.StructureType;
 import me.BlackKnight625.DuringGame.Team;
 
 @SuppressWarnings("unused")
@@ -116,6 +125,17 @@ public final class EventsHandler implements Listener {
 			}
 		}
 	}
+
+	@EventHandler
+	public void blockPlaceEvent(BlockPlaceEvent e) {
+		Player p = e.getPlayer();
+		Block b = e.getBlock();
+		if (b.getType().equals(Material.TNT)) {
+			if (p.getInventory().getItemInMainHand().getItemMeta().getDisplayName().equalsIgnoreCase("Anti-water TNT")) {
+				Main.setMetadata(b, "Water TNT", true);
+			}
+		}
+	}
 	
 	@EventHandler
 	public void playerDieEvent(PlayerDeathEvent e) {
@@ -127,14 +147,10 @@ public final class EventsHandler implements Listener {
 			int timeOfLastHit = (int) Main.getMetadata(p, "Age");
 			int timeOfDeath = p.getTicksLived();
 			int timeSinceLastHit = timeOfDeath - timeOfLastHit;			
-			Bukkit.broadcastMessage("Time of last hit: " + timeOfLastHit);
-			Bukkit.broadcastMessage("Time of death: " + timeOfDeath);
-			Bukkit.broadcastMessage("Time since last hit: " + timeSinceLastHit);
 			if (timeSinceLastHit <= 600) {
 				k = (Player) Main.getMetadata(p, "Killer");
 			}
 		}
-		Bukkit.broadcastMessage("Killer: " + k);
 				int odds = rand.nextInt(1000) + 1;
 				if (k != null) {
 					if (k.getType().equals(EntityType.PLAYER)) {
@@ -176,6 +192,34 @@ public final class EventsHandler implements Listener {
 				}				
 	}
 
+	@EventHandler
+	public void playerInteractEvent(PlayerInteractEvent e) {
+		if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+			Player p = e.getPlayer();		
+			ItemStack item = p.getInventory().getItemInMainHand();
+			ItemMeta meta = item.getItemMeta();
+			if (meta != null) {
+				//Structure summoning items have Unbreaking enchantments
+				if (meta.hasEnchant(Enchantment.DURABILITY)) {
+					String name = meta.getDisplayName();
+					String itemName = name.replaceAll(" ", "_").toUpperCase();
+					for (StructureType type : StructureType.values()) {
+						if (type.toString().equalsIgnoreCase(itemName)) {
+							try {
+								new Structure(type, p);
+								Utilities.removeNumberOfItemsFromPlayerMainHand(p, 1);
+							} catch (ArithmeticException ex) {
+								p.sendMessage("You are not in a team");
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					}
+				} 
+			}
+		}
+	}
+	
 	@EventHandler
 	public void entityDamageByEntityEvent(EntityDamageByEntityEvent e) {
 		Entity damaged = e.getEntity();
@@ -463,6 +507,36 @@ public final class EventsHandler implements Listener {
 					int curAge = item.getTicksLived();
 					if ((curAge - iniAge) <= 60) {
 						e.setCancelled(true);
+					}
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void tntIgnite(BlockIgniteEvent e) {
+		Block b = e.getBlock();
+		Bukkit.broadcastMessage("Block: " + b);
+		if (b.getType().equals(Material.TNT)) {
+			if (b.hasMetadata("Water TNT") && Main.getMetadata(b, "Water TNT") != null) {
+				Entity tnt = b.getWorld().spawnEntity(b.getLocation(), EntityType.PRIMED_TNT);
+				Main.setMetadata(tnt, "Water TNT", true);
+				b.getLocation().getBlock().setType(Material.AIR);
+				e.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void explosion(EntityExplodeEvent e) {
+		if (e.getEntityType().equals(EntityType.PRIMED_TNT)) {
+			Entity tnt = e.getEntity();
+			if (tnt.hasMetadata("Water TNT") && Main.getMetadata(tnt, "Water TNT") != null) {
+				for (Block b : Utilities.getBlocksInRadius(tnt.getLocation().getBlock(), 2)) {
+					Material m = b.getType();
+					if (m.equals(Material.WATER)) {
+						BlockState state = b.getState();
+						Bukkit.broadcastMessage("" + state.getBlockData());
 					}
 				}
 			}

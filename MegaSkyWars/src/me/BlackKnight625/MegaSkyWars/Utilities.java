@@ -1076,4 +1076,15 @@ public class Utilities {
 		}
 	}
 
+	public static void removeNumberOfItemsFromPlayerMainHand(Player p, int amount) {
+		ItemStack air = new ItemStack(Material.AIR);
+		ItemStack items = p.getInventory().getItemInMainHand();
+		int nItems = items.getAmount();
+		if (nItems <= amount) {
+			p.getInventory().setItemInMainHand(air);
+		}
+		else {
+			p.getInventory().getItemInMainHand().setAmount(nItems - amount);
+		}
+	}
 }
