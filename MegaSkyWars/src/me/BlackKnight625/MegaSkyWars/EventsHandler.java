@@ -514,17 +514,16 @@ public final class EventsHandler implements Listener {
 	}
 
 	@EventHandler
-	public void tntIgnite(BlockIgniteEvent e) {
-		Block b = e.getBlock();
-		Bukkit.broadcastMessage("Block: " + b);
-		if (b.getType().equals(Material.TNT)) {
+	public void tntIgnite(Entity e) {
+		
+		/*if (b.getType().equals(Material.TNT)) {
 			if (b.hasMetadata("Water TNT") && Main.getMetadata(b, "Water TNT") != null) {
 				Entity tnt = b.getWorld().spawnEntity(b.getLocation(), EntityType.PRIMED_TNT);
 				Main.setMetadata(tnt, "Water TNT", true);
 				b.getLocation().getBlock().setType(Material.AIR);
 				e.setCancelled(true);
 			}
-		}
+		}*/
 	}
 	
 	@EventHandler
